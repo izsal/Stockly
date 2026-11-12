@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from '@yusufceng1z/ding-react'
 import { Mail, Pencil, Phone, Plus, Search, Trash2, Truck, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -19,8 +20,6 @@ import { ConfirmDialog } from '@/src/components/shared/confirm-dialog'
 import { EmptyState } from '@/src/components/shared/empty-state'
 import { PageHeader } from '@/src/components/shared/page-header'
 import { TablePagination } from '@/src/components/shared/table-pagination'
-import { ToastBanner } from '@/src/components/shared/toast-banner'
-import { useToastBanner } from '@/src/components/shared/use-toast-banner'
 import { SupplierFormDialog, type SupplierItem } from './supplier-form-dialog'
 
 export function SuppliersView({
@@ -41,7 +40,6 @@ export function SuppliersView({
   canWrite: boolean
 }) {
   const router = useRouter()
-  const { toast, showToast, dismissToast } = useToastBanner()
   const [searchInput, setSearchInput] = useState(initialSearch)
   const [formOpen, setFormOpen] = useState(false)
   const [editingSupplier, setEditingSupplier] = useState<SupplierItem | null>(null)
@@ -83,14 +81,14 @@ export function SuppliersView({
     try {
       const result = await deleteSupplierAction(deletingSupplier.id)
       if (!result.ok) {
-        showToast('error', result.message)
+        toast.error(result.message)
         return
       }
       setDeletingSupplier(null)
-      showToast('success', 'Supplier berhasil dihapus.')
+      toast.success('Supplier berhasil dihapus.')
       router.refresh()
     } catch {
-      showToast('error', 'Gagal menghapus supplier. Coba lagi.')
+      toast.error('Gagal menghapus supplier. Coba lagi.')
     } finally {
       setDeletePending(false)
     }
@@ -257,7 +255,7 @@ export function SuppliersView({
           onOpenChange={setFormOpen}
           supplier={editingSupplier}
           onSuccess={(message) => {
-            showToast('success', message)
+            toast.success(message)
             router.refresh()
           }}
         />
@@ -276,8 +274,6 @@ export function SuppliersView({
         pending={deletePending}
         onConfirm={handleConfirmDelete}
       />
-
-      <ToastBanner toast={toast} onDismiss={dismissToast} />
     </div>
   )
 }

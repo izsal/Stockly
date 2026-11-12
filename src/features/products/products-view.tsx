@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from '@yusufceng1z/ding-react'
 import {
   Archive,
   ArchiveRestore,
@@ -29,8 +30,6 @@ import { ConfirmDialog } from '@/src/components/shared/confirm-dialog'
 import { EmptyState } from '@/src/components/shared/empty-state'
 import { PageHeader } from '@/src/components/shared/page-header'
 import { TablePagination } from '@/src/components/shared/table-pagination'
-import { ToastBanner } from '@/src/components/shared/toast-banner'
-import { useToastBanner } from '@/src/components/shared/use-toast-banner'
 import { formatRupiah } from '@/src/lib/format'
 import {
   ProductFormDialog,
@@ -66,7 +65,6 @@ export function ProductsView({
   canWrite: boolean
 }) {
   const router = useRouter()
-  const { toast, showToast, dismissToast } = useToastBanner()
   const [searchInput, setSearchInput] = useState(initialSearch)
   const [formOpen, setFormOpen] = useState(false)
   const [editingProduct, setEditingProduct] = useState<ProductItem | null>(null)
@@ -127,20 +125,19 @@ export function ProductsView({
           : await restoreProductAction(confirmTarget.product.id)
 
       if (!result.ok) {
-        showToast('error', result.message)
+        toast.error(result.message)
         return
       }
 
       setConfirmTarget(null)
-      showToast(
-        'success',
+      toast.success(
         confirmTarget.mode === 'archive'
           ? 'Produk berhasil diarsipkan.'
           : 'Produk berhasil dipulihkan.',
       )
       router.refresh()
     } catch {
-      showToast('error', 'Gagal memperbarui status produk. Coba lagi.')
+      toast.error('Gagal memperbarui status produk. Coba lagi.')
     } finally {
       setStatusPending(false)
     }
@@ -388,7 +385,7 @@ export function ProductsView({
           product={editingProduct}
           categories={categories}
           onSuccess={(message) => {
-            showToast('success', message)
+            toast.success(message)
             router.refresh()
           }}
         />
@@ -412,8 +409,6 @@ export function ProductsView({
         pending={statusPending}
         onConfirm={handleConfirmStatusChange}
       />
-
-      <ToastBanner toast={toast} onDismiss={dismissToast} />
     </div>
   )
 }

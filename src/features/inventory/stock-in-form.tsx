@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { toast } from '@yusufceng1z/ding-react'
 import { History, Package, PackagePlus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -13,8 +14,6 @@ import { createStockInAction } from '@/src/actions/inventory.actions'
 import { ConfirmDialog } from '@/src/components/shared/confirm-dialog'
 import { EmptyState } from '@/src/components/shared/empty-state'
 import { PageHeader } from '@/src/components/shared/page-header'
-import { ToastBanner } from '@/src/components/shared/toast-banner'
-import { useToastBanner } from '@/src/components/shared/use-toast-banner'
 import { stockInSchema } from '@/src/lib/validation/inventory'
 import { StockPreviewCard } from './stock-preview-card'
 import type { InventoryProductOption, InventorySupplierOption } from './types'
@@ -27,7 +26,6 @@ export function StockInForm({
   suppliers: InventorySupplierOption[]
 }) {
   const router = useRouter()
-  const { toast, showToast, dismissToast } = useToastBanner()
   const [productId, setProductId] = useState(products[0]?.id ?? '')
   const [quantity, setQuantity] = useState('')
   const [supplierId, setSupplierId] = useState('')
@@ -95,7 +93,7 @@ export function StockInForm({
           )
         }
         setFormError(result.message)
-        showToast('error', result.message)
+        toast.error(result.message)
         return
       }
 
@@ -103,8 +101,7 @@ export function StockInForm({
       setQuantity('')
       setReferenceNumber('')
       setNotes('')
-      showToast(
-        'success',
+      toast.success(
         `Stok masuk berhasil dicatat (${selectedProduct?.name ?? 'Produk'} +${result.data.quantityDelta}).`,
       )
       router.refresh()
@@ -304,8 +301,6 @@ export function StockInForm({
         pending={pending}
         onConfirm={handleConfirmSubmit}
       />
-
-      <ToastBanner toast={toast} onDismiss={dismissToast} />
     </div>
   )
 }

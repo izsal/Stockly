@@ -13,15 +13,17 @@ describe('workspace permissions', () => {
     expect(hasWorkspacePermission('OWNER', 'inventory:read')).toBe(true)
     expect(hasWorkspacePermission('OWNER', 'inventory:write')).toBe(true)
     expect(hasWorkspacePermission('OWNER', 'movements:read')).toBe(true)
+    expect(hasWorkspacePermission('OWNER', 'reports:read')).toBe(true)
   })
 
-  it('allows STAFF to read catalog/suppliers/movements and create inventory movements, but forbids master-data mutations', () => {
+  it('allows STAFF to read catalog/suppliers/movements/reports and create inventory movements, but forbids master-data mutations', () => {
     expect(hasWorkspacePermission('STAFF', 'categories:read')).toBe(true)
     expect(hasWorkspacePermission('STAFF', 'products:read')).toBe(true)
     expect(hasWorkspacePermission('STAFF', 'suppliers:read')).toBe(true)
     expect(hasWorkspacePermission('STAFF', 'inventory:read')).toBe(true)
     expect(hasWorkspacePermission('STAFF', 'inventory:write')).toBe(true)
     expect(hasWorkspacePermission('STAFF', 'movements:read')).toBe(true)
+    expect(hasWorkspacePermission('STAFF', 'reports:read')).toBe(true)
 
     expect(hasWorkspacePermission('STAFF', 'categories:write')).toBe(false)
     expect(hasWorkspacePermission('STAFF', 'products:write')).toBe(false)

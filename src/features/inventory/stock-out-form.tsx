@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { toast } from '@yusufceng1z/ding-react'
 import { History, Package, PackageMinus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -13,8 +14,6 @@ import { createStockOutAction } from '@/src/actions/inventory.actions'
 import { ConfirmDialog } from '@/src/components/shared/confirm-dialog'
 import { EmptyState } from '@/src/components/shared/empty-state'
 import { PageHeader } from '@/src/components/shared/page-header'
-import { ToastBanner } from '@/src/components/shared/toast-banner'
-import { useToastBanner } from '@/src/components/shared/use-toast-banner'
 import {
   STOCK_OUT_REASONS,
   STOCK_OUT_REASON_LABELS,
@@ -26,7 +25,6 @@ import type { InventoryProductOption } from './types'
 
 export function StockOutForm({ products }: { products: InventoryProductOption[] }) {
   const router = useRouter()
-  const { toast, showToast, dismissToast } = useToastBanner()
   const [productId, setProductId] = useState(products[0]?.id ?? '')
   const [quantity, setQuantity] = useState('')
   const [reason, setReason] = useState<StockOutReason>('SALE')
@@ -101,7 +99,7 @@ export function StockOutForm({ products }: { products: InventoryProductOption[] 
           )
         }
         setFormError(result.message)
-        showToast('error', result.message)
+        toast.error(result.message)
         return
       }
 
@@ -109,8 +107,7 @@ export function StockOutForm({ products }: { products: InventoryProductOption[] 
       setQuantity('')
       setReferenceNumber('')
       setNotes('')
-      showToast(
-        'success',
+      toast.success(
         `Stok keluar berhasil dicatat (${selectedProduct?.name ?? 'Produk'} ${result.data.quantityDelta}).`,
       )
       router.refresh()
@@ -312,8 +309,6 @@ export function StockOutForm({ products }: { products: InventoryProductOption[] 
         pending={pending}
         onConfirm={handleConfirmSubmit}
       />
-
-      <ToastBanner toast={toast} onDismiss={dismissToast} />
     </div>
   )
 }

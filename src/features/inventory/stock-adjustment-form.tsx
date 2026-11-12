@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { toast } from '@yusufceng1z/ding-react'
 import { ClipboardCheck, History, Package } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -13,8 +14,6 @@ import { createStockAdjustmentAction } from '@/src/actions/inventory.actions'
 import { ConfirmDialog } from '@/src/components/shared/confirm-dialog'
 import { EmptyState } from '@/src/components/shared/empty-state'
 import { PageHeader } from '@/src/components/shared/page-header'
-import { ToastBanner } from '@/src/components/shared/toast-banner'
-import { useToastBanner } from '@/src/components/shared/use-toast-banner'
 import { stockAdjustmentSchema } from '@/src/lib/validation/inventory'
 import { StockPreviewCard } from './stock-preview-card'
 import type { InventoryProductOption } from './types'
@@ -28,7 +27,6 @@ const ADJUSTMENT_REASON_PRESETS = [
 
 export function StockAdjustmentForm({ products }: { products: InventoryProductOption[] }) {
   const router = useRouter()
-  const { toast, showToast, dismissToast } = useToastBanner()
   const [productId, setProductId] = useState(products[0]?.id ?? '')
   const [countedQuantity, setCountedQuantity] = useState('')
   const [reason, setReason] = useState('Opname Stok')
@@ -110,7 +108,7 @@ export function StockAdjustmentForm({ products }: { products: InventoryProductOp
           )
         }
         setFormError(result.message)
-        showToast('error', result.message)
+        toast.error(result.message)
         return
       }
 
@@ -121,8 +119,7 @@ export function StockAdjustmentForm({ products }: { products: InventoryProductOp
         result.data.quantityDelta > 0
           ? `+${result.data.quantityDelta}`
           : String(result.data.quantityDelta)
-      showToast(
-        'success',
+      toast.success(
         `Penyesuaian stok berhasil disimpan (${selectedProduct?.name ?? 'Produk'} ${deltaText}).`,
       )
       router.refresh()
@@ -323,8 +320,6 @@ export function StockAdjustmentForm({ products }: { products: InventoryProductOp
         pending={pending}
         onConfirm={handleConfirmSubmit}
       />
-
-      <ToastBanner toast={toast} onDismiss={dismissToast} />
     </div>
   )
 }

@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
+  BarChart3,
   ClipboardCheck,
   History,
   LayoutDashboard,
@@ -67,6 +68,16 @@ const NAV_GROUPS = [
         href: '/suppliers',
         label: 'Supplier',
         icon: Truck,
+      },
+    ],
+  },
+  {
+    label: 'LAPORAN',
+    items: [
+      {
+        href: '/reports',
+        label: 'Laporan',
+        icon: BarChart3,
       },
     ],
   },

@@ -18,6 +18,7 @@ export type WorkspaceAction =
   | 'inventory:read'
   | 'inventory:write'
   | 'movements:read'
+  | 'reports:read'
 
 const WORKSPACE_PERMISSIONS: Record<WorkspaceAction, readonly WorkspaceRole[]> = {
   'categories:read': ['OWNER', 'STAFF'],
@@ -29,6 +30,7 @@ const WORKSPACE_PERMISSIONS: Record<WorkspaceAction, readonly WorkspaceRole[]> =
   'inventory:read': ['OWNER', 'STAFF'],
   'inventory:write': ['OWNER', 'STAFF'],
   'movements:read': ['OWNER', 'STAFF'],
+  'reports:read': ['OWNER', 'STAFF'],
 }
 
 export function hasWorkspacePermission(role: WorkspaceRole, action: WorkspaceAction): boolean {

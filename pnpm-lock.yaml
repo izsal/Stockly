@@ -14,6 +14,9 @@ importers:
       '@vercel/analytics':
         specifier: 1.6.1
         version: 1.6.1(next@16.4.3(@babel/core@7.29.7)(@types/node@24.10.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
+      '@yusufceng1z/ding-react':
+        specifier: ^0.0.4
+        version: 0.0.4(react@19.2.4)
       better-auth:
         specifier: ^1.7.20
         version: 1.7.20(drizzle-kit@0.31.11)(drizzle-orm@0.45.4(@types/pg@8.23.1)(kysely@0.29.8)(pg@8.23.1))(next@16.4.3(@babel/core@7.29.7)(@types/node@24.10.4)(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(pg@8.23.1)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vitest@5.1.0(@types/node@24.10.4)(vite@8.3.7(@types/node@24.10.4)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)))
@@ -1651,6 +1654,16 @@ packages:
 
   '@vitest/spy@5.1.0':
     resolution: {integrity: sha512-2DPO5OMHWKrBngC+fCmTQqemNF0gidRhp3lxbBmRhW+M1XJrfgPpqNqWVevXtn2f2ufD5ZaR1B6B641aAlcX5A==}
+
+  '@yusufceng1z/ding-react@0.0.4':
+    resolution: {integrity: sha512-zESyyRnDPZrFkYIkc7LQ8rGJJHbugUhOen1QBqt/NSUp+IfEwpL6pOP/F/DZaqmBJyDmYVb2MmMQOXWc7t1Xmw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      react: '>=18'
+
+  '@yusufceng1z/ding@0.0.4':
+    resolution: {integrity: sha512-bptHE+0IPUk3qEqFfZ7y9+hafwOSS3QiFRcnP9PbZBG4H2tdEW+eWd5WwFQ6y65M5DFMal9LkD4dOrkAJwE8jg==}
+    engines: {node: '>=18'}
 
   accepts@2.0.0:
     resolution: {integrity: sha512-5cvg6CtKwfgdmVqY1WIiXKc3Q1bkRqGLi+2W/6ao+6Y7gu/RCwRuAhGEzh5B4KlszSuTLgZYuqFqo5bImjNKng==}
@@ -5244,6 +5257,13 @@ snapshots:
       vite: 8.3.7(@types/node@24.10.4)(esbuild@0.28.2)(jiti@2.7.0)(tsx@4.23.15)
 
   '@vitest/spy@5.1.0': {}
+
+  '@yusufceng1z/ding-react@0.0.4(react@19.2.4)':
+    dependencies:
+      '@yusufceng1z/ding': 0.0.4
+      react: 19.2.4
+
+  '@yusufceng1z/ding@0.0.4': {}
 
   accepts@2.0.0:
     dependencies:

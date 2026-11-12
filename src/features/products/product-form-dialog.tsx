@@ -20,7 +20,11 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { createProductAction, updateProductAction } from '@/src/actions/catalog.actions'
-import { formatDecimalInputValue } from '@/src/lib/format'
+import {
+  formatDecimalToRupiahInput,
+  formatRupiahTyping,
+  parseRupiahInputToDecimal,
+} from '@/src/lib/format'
 import { createProductSchema } from '@/src/lib/validation/catalog'
 
 export type ProductItem = {
@@ -65,10 +69,10 @@ export function ProductFormDialog({
   const [categoryId, setCategoryId] = useState(product?.categoryId ?? '')
   const [unit, setUnit] = useState(product?.unit ?? 'pcs')
   const [costPrice, setCostPrice] = useState(
-    product ? formatDecimalInputValue(product.costPrice) : '0',
+    product ? formatDecimalToRupiahInput(product.costPrice) : '0',
   )
   const [sellingPrice, setSellingPrice] = useState(
-    product ? formatDecimalInputValue(product.sellingPrice) : '0',
+    product ? formatDecimalToRupiahInput(product.sellingPrice) : '0',
   )
   const [minimumStock, setMinimumStock] = useState(
     product ? String(product.minimumStock) : '0',
@@ -91,8 +95,8 @@ export function ProductFormDialog({
       barcode,
       categoryId: categoryId || null,
       unit,
-      costPrice,
-      sellingPrice,
+      costPrice: parseRupiahInputToDecimal(costPrice),
+      sellingPrice: parseRupiahInputToDecimal(sellingPrice),
       minimumStock,
       description,
     })
@@ -252,17 +256,26 @@ export function ProductFormDialog({
 
               <Field data-invalid={Boolean(fieldErrors.costPrice)}>
                 <FieldLabel htmlFor="product-cost-price">Harga modal (Rp)</FieldLabel>
-                <Input
-                  id="product-cost-price"
-                  name="costPrice"
-                  inputMode="decimal"
-                  value={costPrice}
-                  onChange={(e) => setCostPrice(e.target.value)}
-                  placeholder="0"
-                  disabled={pending}
-                  aria-invalid={Boolean(fieldErrors.costPrice)}
-                  aria-describedby={fieldErrors.costPrice ? 'product-cost-error' : undefined}
-                />
+                <div className="relative">
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm font-medium text-muted-foreground"
+                  >
+                    Rp
+                  </span>
+                  <Input
+                    id="product-cost-price"
+                    name="costPrice"
+                    inputMode="decimal"
+                    className="pl-9 tabular-nums"
+                    value={costPrice}
+                    onChange={(e) => setCostPrice(formatRupiahTyping(e.target.value))}
+                    placeholder="0"
+                    disabled={pending}
+                    aria-invalid={Boolean(fieldErrors.costPrice)}
+                    aria-describedby={fieldErrors.costPrice ? 'product-cost-error' : undefined}
+                  />
+                </div>
                 {fieldErrors.costPrice ? (
                   <FieldError id="product-cost-error">{fieldErrors.costPrice}</FieldError>
                 ) : null}
@@ -270,17 +283,26 @@ export function ProductFormDialog({
 
               <Field data-invalid={Boolean(fieldErrors.sellingPrice)}>
                 <FieldLabel htmlFor="product-selling-price">Harga jual (Rp)</FieldLabel>
-                <Input
-                  id="product-selling-price"
-                  name="sellingPrice"
-                  inputMode="decimal"
-                  value={sellingPrice}
-                  onChange={(e) => setSellingPrice(e.target.value)}
-                  placeholder="0"
-                  disabled={pending}
-                  aria-invalid={Boolean(fieldErrors.sellingPrice)}
-                  aria-describedby={fieldErrors.sellingPrice ? 'product-selling-error' : undefined}
-                />
+                <div className="relative">
+                  <span
+                    aria-hidden="true"
+                    className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm font-medium text-muted-foreground"
+                  >
+                    Rp
+                  </span>
+                  <Input
+                    id="product-selling-price"
+                    name="sellingPrice"
+                    inputMode="decimal"
+                    className="pl-9 tabular-nums"
+                    value={sellingPrice}
+                    onChange={(e) => setSellingPrice(formatRupiahTyping(e.target.value))}
+                    placeholder="0"
+                    disabled={pending}
+                    aria-invalid={Boolean(fieldErrors.sellingPrice)}
+                    aria-describedby={fieldErrors.sellingPrice ? 'product-selling-error' : undefined}
+                  />
+                </div>
                 {fieldErrors.sellingPrice ? (
                   <FieldError id="product-selling-error">{fieldErrors.sellingPrice}</FieldError>
                 ) : null}

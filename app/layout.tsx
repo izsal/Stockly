@@ -1,4 +1,5 @@
 import { Analytics } from '@vercel/analytics/next'
+import { Toaster } from '@yusufceng1z/ding-react'
 import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
@@ -33,6 +34,11 @@ export default function RootLayout({
   return (
     <html lang="id" className="light">
       <body className="antialiased">
+        <Toaster
+          position="top-center"
+          theme="light"
+          labels={{ region: 'Notifikasi', dismiss: 'Tutup notifikasi' }}
+        />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

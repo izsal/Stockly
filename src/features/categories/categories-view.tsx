@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from '@yusufceng1z/ding-react'
 import { Pencil, Plus, Search, Tags, Trash2, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
@@ -19,8 +20,6 @@ import { ConfirmDialog } from '@/src/components/shared/confirm-dialog'
 import { EmptyState } from '@/src/components/shared/empty-state'
 import { PageHeader } from '@/src/components/shared/page-header'
 import { TablePagination } from '@/src/components/shared/table-pagination'
-import { ToastBanner } from '@/src/components/shared/toast-banner'
-import { useToastBanner } from '@/src/components/shared/use-toast-banner'
 import { CategoryFormDialog, type CategoryItem } from './category-form-dialog'
 
 export function CategoriesView({
@@ -41,7 +40,6 @@ export function CategoriesView({
   canWrite: boolean
 }) {
   const router = useRouter()
-  const { toast, showToast, dismissToast } = useToastBanner()
   const [searchInput, setSearchInput] = useState(initialSearch)
   const [formOpen, setFormOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<CategoryItem | null>(null)
@@ -83,14 +81,14 @@ export function CategoriesView({
     try {
       const result = await deleteCategoryAction(deletingCategory.id)
       if (!result.ok) {
-        showToast('error', result.message)
+        toast.error(result.message)
         return
       }
       setDeletingCategory(null)
-      showToast('success', 'Kategori berhasil dihapus.')
+      toast.success('Kategori berhasil dihapus.')
       router.refresh()
     } catch {
-      showToast('error', 'Gagal menghapus kategori. Coba lagi.')
+      toast.error('Gagal menghapus kategori. Coba lagi.')
     } finally {
       setDeletePending(false)
     }
@@ -232,7 +230,7 @@ export function CategoriesView({
           onOpenChange={setFormOpen}
           category={editingCategory}
           onSuccess={(message) => {
-            showToast('success', message)
+            toast.success(message)
             router.refresh()
           }}
         />
@@ -251,8 +249,6 @@ export function CategoriesView({
         pending={deletePending}
         onConfirm={handleConfirmDelete}
       />
-
-      <ToastBanner toast={toast} onDismiss={dismissToast} />
     </div>
   )
 }

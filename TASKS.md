@@ -144,18 +144,18 @@ Acceptance:
 
 ## Milestone 4 — Dashboard and reports
 
-- [ ] Total active products.
-- [ ] Total stock units with clear label.
-- [ ] Low-stock products.
-- [ ] Out-of-stock products.
-- [ ] Recent movements.
-- [ ] Movement summary by date range.
-- [ ] Current stock report.
-- [ ] Low-stock report.
-- [ ] Movement report with filters.
-- [ ] CSV export.
-- [ ] Paginate large datasets.
-- [ ] Verify dashboard aggregates are workspace-scoped.
+- [x] Total active products.
+- [x] Total stock units with clear label.
+- [x] Low-stock products.
+- [x] Out-of-stock products.
+- [x] Recent movements.
+- [x] Movement summary by date range.
+- [x] Current stock report.
+- [x] Low-stock report.
+- [x] Movement report with filters.
+- [x] CSV export.
+- [x] Paginate large datasets.
+- [x] Verify dashboard aggregates are workspace-scoped.
 
 Acceptance:
 - Dashboard numbers match database records.
