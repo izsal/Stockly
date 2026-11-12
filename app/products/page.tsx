@@ -51,7 +51,7 @@ export default async function ProductsPage({
       categoryId: validCategoryId || undefined,
       status,
       page,
-      pageSize: 20,
+      pageSize: 10,
     }),
     CategoryService.listCategories(ctx, { page: 1, pageSize: 100 }),
   ])

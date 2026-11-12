@@ -63,7 +63,7 @@ export default async function MovementsPage({
       dateFrom: rawDateFrom || undefined,
       dateTo: rawDateTo || undefined,
       page,
-      pageSize: 20,
+      pageSize: 10,
     }),
     ProductService.listProducts(ctx, { status: 'all', page: 1, pageSize: 100 }),
   ])

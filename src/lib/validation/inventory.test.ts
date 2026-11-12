@@ -139,7 +139,7 @@ describe('listMovementsQuerySchema', () => {
       dateTo: '2026-11-12',
       search: 'INV-123',
       page: 1,
-      pageSize: 20,
+      pageSize: 10,
     })
   })
 })

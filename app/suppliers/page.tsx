@@ -35,7 +35,7 @@ export default async function SuppliersPage({
   const result = await SupplierService.listSuppliers(ctx, {
     search: search || undefined,
     page,
-    pageSize: 20,
+    pageSize: 10,
   })
 
   return (

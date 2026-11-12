@@ -35,7 +35,7 @@ export default async function CategoriesPage({
   const result = await CategoryService.listCategories(ctx, {
     search: search || undefined,
     page,
-    pageSize: 20,
+    pageSize: 10,
   })
 
   return (

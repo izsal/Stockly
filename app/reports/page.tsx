@@ -85,31 +85,31 @@ export default async function ReportsPage({
       ProductService.listProducts(ctx, { status: 'all', page: 1, pageSize: 100 }),
       tab === 'current-stock'
         ? ReportService.getCurrentStockReport(ctx, {
-            search: search || undefined,
-            categoryId: validCategoryId || undefined,
-            stockStatus,
-            page,
-            pageSize: 20,
-          })
+          search: search || undefined,
+          categoryId: validCategoryId || undefined,
+          stockStatus,
+          page,
+          pageSize: 10,
+        })
         : Promise.resolve(null),
       tab === 'low-stock'
         ? ReportService.getLowStockReport(ctx, {
-            search: search || undefined,
-            categoryId: validCategoryId || undefined,
-            page,
-            pageSize: 20,
-          })
+          search: search || undefined,
+          categoryId: validCategoryId || undefined,
+          page,
+          pageSize: 10,
+        })
         : Promise.resolve(null),
       tab === 'movements'
         ? ReportService.getMovementReport(ctx, {
-            search: search || undefined,
-            productId: validProductId || undefined,
-            type: validType || undefined,
-            dateFrom: dateFrom || undefined,
-            dateTo: dateTo || undefined,
-            page,
-            pageSize: 20,
-          })
+          search: search || undefined,
+          productId: validProductId || undefined,
+          type: validType || undefined,
+          dateFrom: dateFrom || undefined,
+          dateTo: dateTo || undefined,
+          page,
+          pageSize: 10,
+        })
         : Promise.resolve(null),
     ])
 

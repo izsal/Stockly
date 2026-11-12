@@ -35,7 +35,7 @@ describe('reports validation and date helpers', () => {
       categoryId: null,
       stockStatus: 'low',
       page: 1,
-      pageSize: 20,
+      pageSize: 10,
     })
 
     expect(reportExportQuerySchema.safeParse({ report: 'unknown' }).success).toBe(false)
