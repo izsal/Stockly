@@ -72,29 +72,29 @@ Verification note: Sign-up, sign-in, and sign-out are implemented; full session 
 ## Milestone 2 — Product and category management
 
 ### Database
-- [ ] Add categories.
-- [ ] Add products.
-- [ ] Add workspace-scoped SKU uniqueness.
-- [ ] Add optional workspace-scoped barcode uniqueness.
-- [ ] Add soft-delete fields and indexes.
+- [x] Add categories.
+- [x] Add products.
+- [x] Add workspace-scoped SKU uniqueness.
+- [x] Add optional workspace-scoped barcode uniqueness.
+- [x] Add soft-delete fields and indexes.
 
 ### Services and validation
-- [ ] Create product schemas with Zod.
-- [ ] Create category schemas with Zod.
-- [ ] Implement ProductService.
-- [ ] Implement CategoryService.
-- [ ] Enforce workspace scoping and role checks.
-- [ ] Normalize SKU and barcode consistently.
+- [x] Create product schemas with Zod.
+- [x] Create category schemas with Zod.
+- [x] Implement ProductService.
+- [x] Implement CategoryService.
+- [x] Enforce workspace scoping and role checks.
+- [x] Normalize SKU and barcode consistently.
 
 ### UI
-- [ ] Product list with pagination.
-- [ ] Product search by name/SKU/barcode.
-- [ ] Category filter.
-- [ ] Create product form.
-- [ ] Edit product form.
-- [ ] Archive/deactivate product.
-- [ ] Category CRUD.
-- [ ] Empty, loading, and error states.
+- [x] Product list with pagination.
+- [x] Product search by name/SKU/barcode.
+- [x] Category filter.
+- [x] Create product form.
+- [x] Edit product form.
+- [x] Archive/deactivate product.
+- [x] Category CRUD.
+- [x] Empty, loading, and error states.
 
 Acceptance:
 - Product CRUD works.

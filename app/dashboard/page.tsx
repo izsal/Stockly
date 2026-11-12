@@ -1,17 +1,16 @@
 import type { Metadata } from 'next'
 import { and, eq } from 'drizzle-orm'
 import { Building2, ShieldCheck, Warehouse } from 'lucide-react'
-import { redirect } from 'next/navigation'
 import {
   Card,
   CardContent,
   CardHeader,
 } from '@/components/ui/card'
 import { DashboardShell } from '@/src/components/app/dashboard-shell'
+import { MissingWorkspaceState } from '@/src/components/app/missing-workspace-card'
 import { db } from '@/src/db'
 import { warehouses } from '@/src/db/schema'
-import { getSession } from '@/src/lib/auth-session'
-import { getCurrentWorkspaceForUser } from '@/src/lib/workspaces/current'
+import { requireDashboardWorkspace } from '@/src/lib/workspaces/dashboard-auth'
 
 export const metadata: Metadata = {
   title: 'Ringkasan',
@@ -19,24 +18,10 @@ export const metadata: Metadata = {
 }
 
 export default async function DashboardPage() {
-  const session = await getSession()
-  if (!session?.user) redirect('/sign-in')
-
-  const workspace = await getCurrentWorkspaceForUser(session.user.id)
+  const { session, workspace } = await requireDashboardWorkspace()
 
   if (!workspace) {
-    return (
-      <DashboardShell workspaceName="Stockly" userName={session.user.name}>
-        <Card role="alert">
-          <CardHeader className="px-6 pt-6">
-            <h1 className="text-xl font-semibold">Ruang kerja belum tersedia</h1>
-            <p className="text-sm leading-6 text-muted-foreground">
-              Akun Anda aktif, tetapi ruang kerja belum berhasil disiapkan. Keluar lalu masuk kembali; jika masalah berlanjut, hubungi pengelola.
-            </p>
-          </CardHeader>
-        </Card>
-      </DashboardShell>
-    )
+    return <MissingWorkspaceState userName={session.user.name} />
   }
 
   const [defaultWarehouse] = await db
@@ -46,7 +31,11 @@ export default async function DashboardPage() {
     .limit(1)
 
   return (
-    <DashboardShell workspaceName={workspace.name} userName={session.user.name}>
+    <DashboardShell
+      workspaceName={workspace.name}
+      userName={session.user.name}
+      role={workspace.role}
+    >
       <section aria-labelledby="dashboard-title">
         <div className="mb-8 flex flex-col gap-2">
           <p className="text-sm font-medium text-primary">Ruang kerja siap</p>
