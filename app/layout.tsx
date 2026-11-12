@@ -1,6 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
-import { Toaster } from '@yusufceng1z/ding-react'
 import type { Metadata, Viewport } from 'next'
+import { ThemeProvider } from '@/src/components/app/theme-provider'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -11,19 +11,18 @@ export const metadata: Metadata = {
   description:
     'Stockly membantu bisnis Indonesia menata ruang kerja dan persediaan dengan lebih jelas.',
   applicationName: 'Stockly',
-  generator: 'v0.app',
   icons: {
-    icon: [
-      { url: '/icon-light-32x32.png', media: '(prefers-color-scheme: light)' },
-      { url: '/icon.svg', type: 'image/svg+xml' },
-    ],
-    apple: '/apple-icon.png',
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    shortcut: '/icon.svg',
   },
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#f7f8fb',
+  colorScheme: 'light dark',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#f7f8fb' },
+    { media: '(prefers-color-scheme: dark)', color: '#141518' },
+  ],
 }
 
 export default function RootLayout({
@@ -32,15 +31,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="id" className="light">
+    <html lang="id" suppressHydrationWarning>
       <body className="antialiased">
-        <Toaster
-          position="top-center"
-          theme="light"
-          labels={{ region: 'Notifikasi', dismiss: 'Tutup notifikasi' }}
-        />
-        {children}
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        <ThemeProvider>
+          {children}
+          {process.env.NODE_ENV === 'production' && <Analytics />}
+        </ThemeProvider>
       </body>
     </html>
   )

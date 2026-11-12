@@ -167,32 +167,32 @@ Acceptance:
 ## Milestone 5 — Quality, security, and beta release
 
 ### Testing
-- [ ] Unit tests for movement calculations.
-- [ ] Integration tests for inventory transactions.
-- [ ] Tenant isolation tests.
-- [ ] Role authorization tests.
-- [ ] Negative-stock tests.
-- [ ] Concurrency tests.
-- [ ] E2E test for registration to stock reporting.
-- [ ] Responsive tests at 375px, 768px, 1024px, and 1440px.
+- [x] Unit tests for movement calculations.
+- [x] Integration tests for inventory transactions. (Verified against stateful transactional DB harness with row-level `FOR UPDATE` locking and ledger reconciliation; live Neon execution requires network-enabled environment)
+- [x] Tenant isolation tests.
+- [x] Role authorization tests.
+- [x] Negative-stock tests.
+- [x] Concurrency tests.
+- [x] E2E test for registration to stock reporting. (`src/services/e2e-flow.test.ts` verifies registration -> provisioning -> movements -> reconciled CSV export; live browser E2E requires Playwright/Chromium + live Neon DB)
+- [x] Responsive tests at 375px, 768px, 1024px, and 1440px. (`src/components/app/responsive-layout.test.ts` verifies mobile drawer, desktop collapsible grid, `overflow-x-auto` tables, and `w-full min-w-0` filter safeguards; visual browser viewport check requires Chromium/Playwright)
 
 ### Security and operations
-- [ ] Review environment variables.
-- [ ] Review auth cookie/session configuration.
-- [ ] Verify server-only database access.
-- [ ] Add rate limiting to sensitive endpoints where appropriate.
-- [ ] Add safe error handling and server logging.
-- [ ] Confirm database backup/recovery approach.
-- [ ] Verify Vercel plan terms for intended commercial use.
-- [ ] Verify Neon quota and connection usage.
-- [ ] Add production deployment instructions.
+- [x] Review environment variables. (`src/lib/env.ts` + `.env.example` + tests)
+- [x] Review auth cookie/session configuration. (`src/lib/auth.ts` `HttpOnly`, `SameSite`, HTTPS `useSecureCookies`, `trustedOrigins`)
+- [x] Verify server-only database access. (`src/lib/security/server-only-boundary.test.ts`)
+- [x] Add rate limiting to sensitive endpoints where appropriate. (`src/lib/rate-limit.ts` applied to `/api/register`, `/api/auth/[...all]`, `/api/reports/export`)
+- [x] Add safe error handling and server logging. (`src/lib/logger.ts` with correlation IDs and credential redaction)
+- [ ] Confirm database backup/recovery approach. (Documented in `docs/OPERATIONS.md`; confirm PITR retention settings in Neon Console)
+- [ ] Verify Vercel plan terms for intended commercial use. (Documented in `docs/OPERATIONS.md`; requires Vercel Pro/commercial plan check before paid launch)
+- [ ] Verify Neon quota and connection usage. (Documented in `docs/OPERATIONS.md`; monitor in Neon Console under live traffic)
+- [x] Add production deployment instructions. (`docs/OPERATIONS.md` + `README.md`)
 
 ### Beta
-- [ ] Create demo workspace and seed data.
-- [ ] Onboard 3–5 pilot businesses.
-- [ ] Collect usability feedback.
-- [ ] Fix blocking bugs.
-- [ ] Document known limitations.
+- [x] Create demo workspace and seed data. (Idempotent `pnpm db:seed` in `src/db/seed.ts` + fixture integrity test; execute `pnpm db:seed` against target Neon DB)
+- [ ] Onboard 3–5 pilot businesses. (Tooling ready: `pnpm pilot:onboard` CLI batch provisioner + in-app dashboard onboarding checklist; run against target DB to provision real pilot merchants)
+- [ ] Collect usability feedback. (In-app **Masukan Beta** dialog + `POST /api/feedback` endpoint ready; collect submissions from live pilot sessions)
+- [x] Fix blocking bugs. (Fixed `AuthForm` HTTP `429` rate-limit message handling, `LogoutButton` stuck pending state on error, and `<select>` mobile `375px` overflow)
+- [x] Document known limitations. (`docs/OPERATIONS.md`)
 
 Acceptance:
 - Build, lint, typecheck, and tests pass.

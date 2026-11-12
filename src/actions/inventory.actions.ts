@@ -1,8 +1,8 @@
 'use server'
 
-import { randomUUID } from 'node:crypto'
 import { revalidatePath } from 'next/cache'
 import { isDomainError, type DomainErrorCode } from '@/src/lib/errors'
+import { logServerError } from '@/src/lib/logger'
 import type {
   StockAdjustmentInput,
   StockInInput,
@@ -42,8 +42,7 @@ async function runInventoryAction<T>(
       }
     }
 
-    const correlationId = randomUUID()
-    console.error(`[inventory-action:${correlationId}]`, error)
+    logServerError('inventory-action', error)
     return {
       ok: false,
       message: 'Terjadi kendala pada server. Silakan coba lagi.',

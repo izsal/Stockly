@@ -29,6 +29,11 @@ import {
   parseUuid,
   type AppDatabase,
 } from './helpers'
+import {
+  computeAdjustmentResult,
+  computeStockInResult,
+  computeStockOutResult,
+} from './inventory-calculations'
 
 const INVENTORY_CONSTRAINT_MESSAGES: Record<string, string> = {
   inventory_stocks_quantity_non_negative_check: 'Stok tidak boleh bernilai negatif.',
@@ -173,9 +178,10 @@ export async function createStockIn(
       await assertSupplierInWorkspace(ctx.workspaceId, data.supplierId, tx)
 
       const stockRow = await lockOrCreateStockRow(ctx.workspaceId, data.productId, warehouseId, tx)
-      const quantityBefore = Number(stockRow.quantity)
-      const quantityDelta = data.quantity
-      const quantityAfter = quantityBefore + quantityDelta
+      const { quantityBefore, quantityDelta, quantityAfter } = computeStockInResult(
+        Number(stockRow.quantity),
+        data.quantity,
+      )
 
       await tx
         .update(inventoryStocks)
@@ -226,16 +232,10 @@ export async function createStockOut(
       await assertActiveProductInWorkspace(ctx.workspaceId, data.productId, tx)
 
       const stockRow = await lockOrCreateStockRow(ctx.workspaceId, data.productId, warehouseId, tx)
-      const quantityBefore = Number(stockRow.quantity)
-      const quantityDelta = -data.quantity
-      const quantityAfter = quantityBefore + quantityDelta
-
-      if (quantityAfter < 0) {
-        throw new DomainError(
-          'INSUFFICIENT_STOCK',
-          `Stok tidak mencukupi. Stok tersedia: ${quantityBefore}.`,
-        )
-      }
+      const { quantityBefore, quantityDelta, quantityAfter } = computeStockOutResult(
+        Number(stockRow.quantity),
+        data.quantity,
+      )
 
       await tx
         .update(inventoryStocks)
@@ -286,16 +286,10 @@ export async function createAdjustment(
       await assertActiveProductInWorkspace(ctx.workspaceId, data.productId, tx)
 
       const stockRow = await lockOrCreateStockRow(ctx.workspaceId, data.productId, warehouseId, tx)
-      const quantityBefore = Number(stockRow.quantity)
-      const quantityAfter = data.countedQuantity
-      const quantityDelta = quantityAfter - quantityBefore
-
-      if (quantityDelta === 0) {
-        throw new DomainError(
-          'VALIDATION_ERROR',
-          'Jumlah fisik sama dengan stok saat ini. Tidak ada penyesuaian yang diperlukan.',
-        )
-      }
+      const { quantityBefore, quantityDelta, quantityAfter } = computeAdjustmentResult(
+        Number(stockRow.quantity),
+        data.countedQuantity,
+      )
 
       await tx
         .update(inventoryStocks)

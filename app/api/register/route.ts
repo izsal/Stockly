@@ -1,7 +1,27 @@
 import { auth } from '@/src/lib/auth'
+import { logServerError, logServerWarn } from '@/src/lib/logger'
+import {
+  createRateLimitHeaders,
+  createRateLimitedResponse,
+  getClientIp,
+  registerRateLimiter,
+} from '@/src/lib/rate-limit'
 import { registerInputSchema } from '@/src/lib/validation/auth'
 
 export async function POST(request: Request) {
+  const clientIp = getClientIp(request)
+  const decision = registerRateLimiter.check(`register:${clientIp}`)
+  if (!decision.allowed) {
+    logServerWarn('auth-register', 'Rate limit exceeded for registration endpoint', {
+      clientIp,
+    })
+    return createRateLimitedResponse(
+      decision,
+      'Terlalu banyak percobaan pendaftaran. Silakan tunggu beberapa menit lalu coba lagi.',
+    )
+  }
+
+  const rateHeaders = createRateLimitHeaders(decision)
   const body = await request.json().catch(() => null)
   const parsed = registerInputSchema.safeParse(body)
 
@@ -11,7 +31,7 @@ export async function POST(request: Request) {
         message: 'Periksa kembali data pendaftaran.',
         errors: parsed.error.flatten().fieldErrors,
       },
-      { status: 400, headers: { 'Cache-Control': 'no-store' } },
+      { status: 400, headers: rateHeaders },
     )
   }
 
@@ -23,19 +43,22 @@ export async function POST(request: Request) {
     })
 
     if (!response.ok) {
-      console.error('[auth] Registration was rejected', response.status)
+      logServerWarn('auth-register', 'Registration was rejected by auth provider', {
+        status: response.status,
+        clientIp,
+      })
       return Response.json(
         { message: 'Pendaftaran belum berhasil. Periksa data lalu coba lagi.' },
-        { status: response.status, headers: { 'Cache-Control': 'no-store' } },
+        { status: response.status, headers: rateHeaders },
       )
     }
 
     return response
   } catch (error) {
-    console.error('[auth] Registration request failed', error)
+    logServerError('auth-register', error, { clientIp })
     return Response.json(
       { message: 'Terjadi kendala saat membuat akun. Coba lagi.' },
-      { status: 500, headers: { 'Cache-Control': 'no-store' } },
+      { status: 500, headers: rateHeaders },
     )
   }
 }

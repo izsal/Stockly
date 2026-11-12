@@ -17,6 +17,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { ModernSelect } from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -180,34 +181,32 @@ export function ProductsView({
             </div>
 
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:flex lg:items-center">
-              <select
-                aria-label="Filter kategori"
+              <ModernSelect
+                ariaLabel="Filter kategori"
                 value={initialCategoryId}
-                onChange={(e) =>
-                  navigateWithParams({ categoryId: e.target.value, page: 1 })
+                onValueChange={(nextValue) =>
+                  navigateWithParams({ categoryId: nextValue, page: 1 })
                 }
-                className="h-9 rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 lg:w-48"
-              >
-                <option value="">Semua kategori</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+                options={[
+                  { value: '', label: 'Semua kategori' },
+                  ...categories.map((cat) => ({ value: cat.id, label: cat.name })),
+                ]}
+                className="w-full min-w-0 lg:w-48"
+              />
 
-              <select
-                aria-label="Filter status produk"
+              <ModernSelect
+                ariaLabel="Filter status produk"
                 value={initialStatus}
-                onChange={(e) =>
-                  navigateWithParams({ status: e.target.value as StatusFilter, page: 1 })
+                onValueChange={(nextValue) =>
+                  navigateWithParams({ status: nextValue as StatusFilter, page: 1 })
                 }
-                className="h-9 rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 lg:w-40"
-              >
-                <option value="active">Aktif</option>
-                <option value="archived">Diarsipkan</option>
-                <option value="all">Semua status</option>
-              </select>
+                options={[
+                  { value: 'active', label: 'Aktif' },
+                  { value: 'archived', label: 'Diarsipkan' },
+                  { value: 'all', label: 'Semua status' },
+                ]}
+                className="w-full min-w-0 lg:w-40"
+              />
             </div>
 
             <div className="flex gap-2">

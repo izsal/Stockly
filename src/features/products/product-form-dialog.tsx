@@ -18,6 +18,7 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { ModernSelect } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { createProductAction, updateProductAction } from '@/src/actions/catalog.actions'
 import {
@@ -215,21 +216,17 @@ export function ProductFormDialog({
 
               <Field data-invalid={Boolean(fieldErrors.categoryId)}>
                 <FieldLabel htmlFor="product-category">Kategori (opsional)</FieldLabel>
-                <select
+                <ModernSelect
                   id="product-category"
                   name="categoryId"
                   value={categoryId}
-                  onChange={(e) => setCategoryId(e.target.value)}
+                  onValueChange={setCategoryId}
                   disabled={pending}
-                  className="h-8 w-full rounded-lg border border-input bg-background px-2.5 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <option value="">Tanpa kategori</option>
-                  {categories.map((cat) => (
-                    <option key={cat.id} value={cat.id}>
-                      {cat.name}
-                    </option>
-                  ))}
-                </select>
+                  options={[
+                    { value: '', label: 'Tanpa kategori' },
+                    ...categories.map((cat) => ({ value: cat.id, label: cat.name })),
+                  ]}
+                />
                 {fieldErrors.categoryId ? (
                   <FieldError>{fieldErrors.categoryId}</FieldError>
                 ) : null}

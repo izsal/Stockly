@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { ModernSelect } from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -199,33 +200,36 @@ export function MovementsView({
               />
             </div>
 
-            <select
-              aria-label="Filter tipe pergerakan"
+            <ModernSelect
+              ariaLabel="Filter tipe pergerakan"
               value={initialType}
-              onChange={(e) =>
-                navigateWithParams({ type: e.target.value as MovementType | '', page: 1 })
+              onValueChange={(nextValue) =>
+                navigateWithParams({ type: nextValue as MovementType | '', page: 1 })
               }
-              className="h-9 rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              <option value="">Semua tipe</option>
-              <option value="IN">Stok Masuk</option>
-              <option value="OUT">Stok Keluar</option>
-              <option value="ADJUSTMENT">Penyesuaian</option>
-            </select>
+              options={[
+                { value: '', label: 'Semua tipe' },
+                { value: 'IN', label: 'Stok Masuk' },
+                { value: 'OUT', label: 'Stok Keluar' },
+                { value: 'ADJUSTMENT', label: 'Penyesuaian' },
+              ]}
+              className="w-full min-w-0"
+            />
 
-            <select
-              aria-label="Filter produk"
+            <ModernSelect
+              ariaLabel="Filter produk"
               value={initialProductId}
-              onChange={(e) => navigateWithParams({ productId: e.target.value, page: 1 })}
-              className="h-9 rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-            >
-              <option value="">Semua produk</option>
-              {products.map((product) => (
-                <option key={product.id} value={product.id}>
-                  {product.name} ({product.sku})
-                </option>
-              ))}
-            </select>
+              onValueChange={(nextValue) =>
+                navigateWithParams({ productId: nextValue, page: 1 })
+              }
+              options={[
+                { value: '', label: 'Semua produk' },
+                ...products.map((product) => ({
+                  value: product.id,
+                  label: `${product.name} (${product.sku})`,
+                })),
+              ]}
+              className="w-full min-w-0"
+            />
 
             <Input
               type="date"

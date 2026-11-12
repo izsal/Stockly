@@ -78,7 +78,14 @@ export function AuthForm({ mode }: { mode: AuthMode }) {
       } else {
         const result = await authClient.signIn.email(parsed.data)
         if (result.error) {
-          setFormError('Email atau kata sandi tidak cocok. Periksa kembali lalu coba lagi.')
+          if (result.error.status === 429) {
+            setFormError(
+              result.error.message ||
+                'Terlalu banyak percobaan masuk. Silakan tunggu beberapa saat lalu coba lagi.',
+            )
+          } else {
+            setFormError('Email atau kata sandi tidak cocok. Periksa kembali lalu coba lagi.')
+          }
           return
         }
       }

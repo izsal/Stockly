@@ -5,9 +5,11 @@ import Link from 'next/link'
 import { Boxes, Building2, Menu, PanelLeftClose, PanelLeftOpen, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { WorkspaceRole } from '@/src/lib/permissions/workspace'
+import { BetaFeedbackButton } from './beta-feedback-dialog'
 import { DashboardNav } from './dashboard-nav'
 import { LogoutButton } from './logout-button'
 import { toggleSidebarCollapsed, useSidebarCollapsed } from './sidebar-state'
+import { ThemeToggle } from './theme-toggle'
 
 function Brand({ collapsed = false }: { collapsed?: boolean }) {
   return (
@@ -117,6 +119,8 @@ export function DashboardShell({
               </>
             )}
           </button>
+
+          <LogoutButton variant="sidebar" collapsed={collapsed} />
         </div>
       </aside>
 
@@ -168,6 +172,8 @@ export function DashboardShell({
               >
                 {initials || 'S'}
               </span>
+              <ThemeToggle />
+              <BetaFeedbackButton />
               <LogoutButton />
             </div>
           </div>

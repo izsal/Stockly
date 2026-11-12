@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { ModernSelect } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { createStockAdjustmentAction } from '@/src/actions/inventory.actions'
 import { ConfirmDialog } from '@/src/components/shared/confirm-dialog'
@@ -169,23 +170,21 @@ export function StockAdjustmentForm({ products }: { products: InventoryProductOp
                 <FieldGroup>
                   <Field data-invalid={Boolean(fieldErrors.productId)}>
                     <FieldLabel htmlFor="adjustment-product">Produk *</FieldLabel>
-                    <select
+                    <ModernSelect
                       id="adjustment-product"
                       name="productId"
                       value={productId}
-                      onChange={(e) => setProductId(e.target.value)}
+                      onValueChange={setProductId}
                       disabled={pending}
-                      aria-invalid={Boolean(fieldErrors.productId)}
-                      className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                    >
-                      <option value="">Pilih produk…</option>
-                      {products.map((product) => (
-                        <option key={product.id} value={product.id}>
-                          {product.name} ({product.sku}) — Stok sistem: {product.currentStock}{' '}
-                          {product.unit}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="Pilih produk…"
+                      options={[
+                        { value: '', label: 'Pilih produk…' },
+                        ...products.map((product) => ({
+                          value: product.id,
+                          label: `${product.name} (${product.sku}) — Stok sistem: ${product.currentStock} ${product.unit}`,
+                        })),
+                      ]}
+                    />
                     {fieldErrors.productId ? (
                       <FieldError>{fieldErrors.productId}</FieldError>
                     ) : null}

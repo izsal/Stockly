@@ -11,6 +11,8 @@ import {
   BarChart3,
   Boxes,
   CalendarRange,
+  CheckCircle2,
+  Circle,
   ClipboardCheck,
   History,
   Package,
@@ -18,6 +20,7 @@ import {
   PackagePlus,
   PackageX,
   Warehouse,
+  X,
 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -97,6 +100,7 @@ export function DashboardView({
   const router = useRouter()
   const [dateFrom, setDateFrom] = useState(summary.dateRange.dateFrom)
   const [dateTo, setDateTo] = useState(summary.dateRange.dateTo)
+  const [checklistDismissed, setChecklistDismissed] = useState(false)
 
   function applyRange(nextFrom: string, nextTo: string) {
     setDateFrom(nextFrom)
@@ -119,6 +123,9 @@ export function DashboardView({
   }
 
   const { kpis, movementSummary, recentMovements, attentionProducts, defaultWarehouse } = summary
+  const hasProducts = kpis.totalActiveProducts > 0
+  const hasMovements = movementSummary.totalMovements > 0 || recentMovements.length > 0
+  const showOnboardingChecklist = !checklistDismissed && (!hasProducts || !hasMovements)
 
   return (
     <div className="space-y-6">
@@ -158,6 +165,83 @@ export function DashboardView({
           </Link>
         </div>
       </div>
+
+      {showOnboardingChecklist ? (
+        <Card className="border-primary/25 bg-primary/[0.03]">
+          <CardHeader className="flex-row items-start justify-between gap-4 px-5 pt-5 pb-3">
+            <div>
+              <p className="text-xs font-semibold tracking-[0.14em] text-primary uppercase">
+                Panduan Memulai Usaha Baru
+              </p>
+              <h2 className="mt-1 text-base font-semibold">
+                Siapkan operasional stok toko Anda dalam 4 langkah
+              </h2>
+            </div>
+            <button
+              type="button"
+              onClick={() => setChecklistDismissed(true)}
+              aria-label="Sembunyikan panduan memulai"
+              className="rounded-md p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+            >
+              <X className="size-4" aria-hidden="true" />
+            </button>
+          </CardHeader>
+          <CardContent className="grid gap-3 px-5 pb-5 sm:grid-cols-2 xl:grid-cols-4">
+            <Link
+              href="/categories"
+              className="flex items-start gap-2.5 rounded-lg border border-border bg-background p-3 text-sm transition-colors hover:border-primary/40"
+            >
+              <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+              <div>
+                <p className="font-medium">1. Siapkan kategori & supplier</p>
+                <p className="text-xs text-muted-foreground">Kelompokkan produk dan relasi pemasok.</p>
+              </div>
+            </Link>
+            <Link
+              href="/products"
+              className="flex items-start gap-2.5 rounded-lg border border-border bg-background p-3 text-sm transition-colors hover:border-primary/40"
+            >
+              {hasProducts ? (
+                <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+              ) : (
+                <Circle className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+              )}
+              <div>
+                <p className="font-medium">2. Tambah produk pertama</p>
+                <p className="text-xs text-muted-foreground">
+                  {hasProducts ? 'Produk aktif sudah tersedia.' : 'Isi SKU, harga, dan stok minimum.'}
+                </p>
+              </div>
+            </Link>
+            <Link
+              href="/inventory/stock-in"
+              className="flex items-start gap-2.5 rounded-lg border border-border bg-background p-3 text-sm transition-colors hover:border-primary/40"
+            >
+              {hasMovements ? (
+                <CheckCircle2 className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+              ) : (
+                <Circle className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+              )}
+              <div>
+                <p className="font-medium">3. Catat stok masuk awal</p>
+                <p className="text-xs text-muted-foreground">
+                  {hasMovements ? 'Mutasi stok awal sudah tercatat.' : 'Tambahkan saldo awal via Stok Masuk.'}
+                </p>
+              </div>
+            </Link>
+            <Link
+              href="/reports"
+              className="flex items-start gap-2.5 rounded-lg border border-border bg-background p-3 text-sm transition-colors hover:border-primary/40"
+            >
+              <Circle className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+              <div>
+                <p className="font-medium">4. Cek laporan & ekspor CSV</p>
+                <p className="text-xs text-muted-foreground">Pantau stok menipis dan unduh laporan.</p>
+              </div>
+            </Link>
+          </CardContent>
+        </Card>
+      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <Card>

@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { ModernSelect } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { createStockInAction } from '@/src/actions/inventory.actions'
 import { ConfirmDialog } from '@/src/components/shared/confirm-dialog'
@@ -151,22 +152,21 @@ export function StockInForm({
                 <FieldGroup>
                   <Field data-invalid={Boolean(fieldErrors.productId)}>
                     <FieldLabel htmlFor="stock-in-product">Produk *</FieldLabel>
-                    <select
+                    <ModernSelect
                       id="stock-in-product"
                       name="productId"
                       value={productId}
-                      onChange={(e) => setProductId(e.target.value)}
+                      onValueChange={setProductId}
                       disabled={pending}
-                      aria-invalid={Boolean(fieldErrors.productId)}
-                      className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                    >
-                      <option value="">Pilih produk…</option>
-                      {products.map((product) => (
-                        <option key={product.id} value={product.id}>
-                          {product.name} ({product.sku}) — Stok: {product.currentStock} {product.unit}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="Pilih produk…"
+                      options={[
+                        { value: '', label: 'Pilih produk…' },
+                        ...products.map((product) => ({
+                          value: product.id,
+                          label: `${product.name} (${product.sku}) — Stok: ${product.currentStock} ${product.unit}`,
+                        })),
+                      ]}
+                    />
                     {fieldErrors.productId ? (
                       <FieldError>{fieldErrors.productId}</FieldError>
                     ) : null}
@@ -199,21 +199,20 @@ export function StockInForm({
 
                     <Field data-invalid={Boolean(fieldErrors.supplierId)}>
                       <FieldLabel htmlFor="stock-in-supplier">Supplier (opsional)</FieldLabel>
-                      <select
+                      <ModernSelect
                         id="stock-in-supplier"
                         name="supplierId"
                         value={supplierId}
-                        onChange={(e) => setSupplierId(e.target.value)}
+                        onValueChange={setSupplierId}
                         disabled={pending}
-                        className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                      >
-                        <option value="">Tanpa supplier</option>
-                        {suppliers.map((supplier) => (
-                          <option key={supplier.id} value={supplier.id}>
-                            {supplier.name}
-                          </option>
-                        ))}
-                      </select>
+                        options={[
+                          { value: '', label: 'Tanpa supplier' },
+                          ...suppliers.map((supplier) => ({
+                            value: supplier.id,
+                            label: supplier.name,
+                          })),
+                        ]}
+                      />
                       {fieldErrors.supplierId ? (
                         <FieldError>{fieldErrors.supplierId}</FieldError>
                       ) : null}

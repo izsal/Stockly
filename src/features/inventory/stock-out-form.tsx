@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { ModernSelect } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { createStockOutAction } from '@/src/actions/inventory.actions'
 import { ConfirmDialog } from '@/src/components/shared/confirm-dialog'
@@ -157,23 +158,21 @@ export function StockOutForm({ products }: { products: InventoryProductOption[] 
                 <FieldGroup>
                   <Field data-invalid={Boolean(fieldErrors.productId)}>
                     <FieldLabel htmlFor="stock-out-product">Produk *</FieldLabel>
-                    <select
+                    <ModernSelect
                       id="stock-out-product"
                       name="productId"
                       value={productId}
-                      onChange={(e) => setProductId(e.target.value)}
+                      onValueChange={setProductId}
                       disabled={pending}
-                      aria-invalid={Boolean(fieldErrors.productId)}
-                      className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                    >
-                      <option value="">Pilih produk…</option>
-                      {products.map((product) => (
-                        <option key={product.id} value={product.id}>
-                          {product.name} ({product.sku}) — Tersedia: {product.currentStock}{' '}
-                          {product.unit}
-                        </option>
-                      ))}
-                    </select>
+                      placeholder="Pilih produk…"
+                      options={[
+                        { value: '', label: 'Pilih produk…' },
+                        ...products.map((product) => ({
+                          value: product.id,
+                          label: `${product.name} (${product.sku}) — Tersedia: ${product.currentStock} ${product.unit}`,
+                        })),
+                      ]}
+                    />
                     {fieldErrors.productId ? (
                       <FieldError>{fieldErrors.productId}</FieldError>
                     ) : null}
@@ -209,21 +208,17 @@ export function StockOutForm({ products }: { products: InventoryProductOption[] 
 
                     <Field data-invalid={Boolean(fieldErrors.reason)}>
                       <FieldLabel htmlFor="stock-out-reason">Alasan keluar *</FieldLabel>
-                      <select
+                      <ModernSelect
                         id="stock-out-reason"
                         name="reason"
                         value={reason}
-                        onChange={(e) => setReason(e.target.value as StockOutReason)}
+                        onValueChange={(nextValue) => setReason(nextValue as StockOutReason)}
                         disabled={pending}
-                        aria-invalid={Boolean(fieldErrors.reason)}
-                        className="h-9 w-full rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-                      >
-                        {STOCK_OUT_REASONS.map((reasonKey) => (
-                          <option key={reasonKey} value={reasonKey}>
-                            {STOCK_OUT_REASON_LABELS[reasonKey]}
-                          </option>
-                        ))}
-                      </select>
+                        options={STOCK_OUT_REASONS.map((reasonKey) => ({
+                          value: reasonKey,
+                          label: STOCK_OUT_REASON_LABELS[reasonKey],
+                        }))}
+                      />
                       {fieldErrors.reason ? <FieldError>{fieldErrors.reason}</FieldError> : null}
                     </Field>
                   </div>

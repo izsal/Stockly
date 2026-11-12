@@ -20,6 +20,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { ModernSelect } from '@/components/ui/select'
 import {
   Table,
   TableBody,
@@ -344,33 +345,34 @@ export function ReportsView({
                 />
               </div>
 
-              <select
-                aria-label="Filter tipe pergerakan"
+              <ModernSelect
+                ariaLabel="Filter tipe pergerakan"
                 value={initialType}
-                onChange={(e) =>
-                  navigateWith({ type: e.target.value as MovementType | '', page: 1 })
+                onValueChange={(nextValue) =>
+                  navigateWith({ type: nextValue as MovementType | '', page: 1 })
                 }
-                className="h-9 rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-              >
-                <option value="">Semua tipe</option>
-                <option value="IN">Stok Masuk</option>
-                <option value="OUT">Stok Keluar</option>
-                <option value="ADJUSTMENT">Penyesuaian</option>
-              </select>
+                options={[
+                  { value: '', label: 'Semua tipe' },
+                  { value: 'IN', label: 'Stok Masuk' },
+                  { value: 'OUT', label: 'Stok Keluar' },
+                  { value: 'ADJUSTMENT', label: 'Penyesuaian' },
+                ]}
+                className="w-full min-w-0"
+              />
 
-              <select
-                aria-label="Filter produk"
+              <ModernSelect
+                ariaLabel="Filter produk"
                 value={initialProductId}
-                onChange={(e) => navigateWith({ productId: e.target.value, page: 1 })}
-                className="h-9 rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
-              >
-                <option value="">Semua produk</option>
-                {products.map((product) => (
-                  <option key={product.id} value={product.id}>
-                    {product.name} ({product.sku})
-                  </option>
-                ))}
-              </select>
+                onValueChange={(nextValue) => navigateWith({ productId: nextValue, page: 1 })}
+                options={[
+                  { value: '', label: 'Semua produk' },
+                  ...products.map((product) => ({
+                    value: product.id,
+                    label: `${product.name} (${product.sku})`,
+                  })),
+                ]}
+                className="w-full min-w-0"
+              />
 
               <Input
                 type="date"
@@ -416,37 +418,35 @@ export function ReportsView({
                 />
               </div>
 
-              <select
-                aria-label="Filter kategori"
+              <ModernSelect
+                ariaLabel="Filter kategori"
                 value={initialCategoryId}
-                onChange={(e) => navigateWith({ categoryId: e.target.value, page: 1 })}
-                className="h-9 rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 lg:w-48"
-              >
-                <option value="">Semua kategori</option>
-                {categories.map((cat) => (
-                  <option key={cat.id} value={cat.id}>
-                    {cat.name}
-                  </option>
-                ))}
-              </select>
+                onValueChange={(nextValue) => navigateWith({ categoryId: nextValue, page: 1 })}
+                options={[
+                  { value: '', label: 'Semua kategori' },
+                  ...categories.map((cat) => ({ value: cat.id, label: cat.name })),
+                ]}
+                className="w-full min-w-0 lg:w-48"
+              />
 
               {tab === 'current-stock' ? (
-                <select
-                  aria-label="Filter status stok"
+                <ModernSelect
+                  ariaLabel="Filter status stok"
                   value={initialStockStatus}
-                  onChange={(e) =>
+                  onValueChange={(nextValue) =>
                     navigateWith({
-                      stockStatus: e.target.value as StockStatusFilter,
+                      stockStatus: nextValue as StockStatusFilter,
                       page: 1,
                     })
                   }
-                  className="h-9 rounded-lg border border-input bg-background px-3 text-sm outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 lg:w-40"
-                >
-                  <option value="all">Semua status stok</option>
-                  <option value="normal">Normal</option>
-                  <option value="low">Menipis (≤ min.)</option>
-                  <option value="out">Habis (= 0)</option>
-                </select>
+                  options={[
+                    { value: 'all', label: 'Semua status stok' },
+                    { value: 'normal', label: 'Normal' },
+                    { value: 'low', label: 'Menipis (≤ min.)' },
+                    { value: 'out', label: 'Habis (= 0)' },
+                  ]}
+                  className="w-full min-w-0 lg:w-40"
+                />
               ) : null}
 
               <div className="flex gap-2">

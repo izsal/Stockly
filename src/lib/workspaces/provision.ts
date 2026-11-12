@@ -4,6 +4,7 @@ import { randomUUID } from 'node:crypto'
 import { eq } from 'drizzle-orm'
 import { db } from '@/src/db'
 import { memberships, users, warehouses, workspaces } from '@/src/db/schema'
+import { logServerError } from '@/src/lib/logger'
 import { slugifyWorkspaceName } from './slug'
 
 type NewAuthUser = {
@@ -45,10 +46,10 @@ export async function provisionWorkspaceForUser(user: NewAuthUser) {
     try {
       await db.delete(users).where(eq(users.id, user.id))
     } catch (cleanupError) {
-      console.error('[auth] Failed to compensate for workspace setup failure', cleanupError)
+      logServerError('auth-provision-cleanup', cleanupError, { userId: user.id })
     }
 
-    console.error('[auth] Workspace setup failed during registration', error)
+    logServerError('auth-provision', error, { userId: user.id })
     throw error
   }
 }

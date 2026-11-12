@@ -1,8 +1,8 @@
 'use server'
 
-import { randomUUID } from 'node:crypto'
 import { revalidatePath } from 'next/cache'
 import { isDomainError, type DomainErrorCode } from '@/src/lib/errors'
+import { logServerError } from '@/src/lib/logger'
 import type {
   CategoryInput,
   CreateProductInput,
@@ -41,8 +41,7 @@ async function runCatalogAction<T>(
       }
     }
 
-    const correlationId = randomUUID()
-    console.error(`[catalog-action:${correlationId}]`, error)
+    logServerError('catalog-action', error)
     return {
       ok: false,
       message: 'Terjadi kendala pada server. Silakan coba lagi.',
