@@ -12,8 +12,9 @@ export const metadata: Metadata = {
     'Stockly membantu bisnis Indonesia menata ruang kerja dan persediaan dengan lebih jelas.',
   applicationName: 'Stockly',
   icons: {
-    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
-    shortcut: '/icon.svg',
+    icon: [{ url: '/icon.svg?v=2', type: 'image/svg+xml' }],
+    shortcut: '/icon.svg?v=2',
+    apple: '/icon.svg?v=2',
   },
 }
 
