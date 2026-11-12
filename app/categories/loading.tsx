@@ -1,6 +1,5 @@
-import { CatalogLoadingSkeleton } from '@/src/components/shared/catalog-skeleton'
+import { CategoriesLoadingSkeleton } from '@/src/components/shared/page-skeletons'
 
 export default function CategoriesLoading() {
-  return <CatalogLoadingSkeleton />
+  return <CategoriesLoadingSkeleton />
 }
-

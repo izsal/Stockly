@@ -15,6 +15,13 @@
       "when": 1794452017987,
       "tag": "0001_categories_and_products",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794453792380,
+      "tag": "0002_suppliers_and_inventory",
+      "breakpoints": true
     }
   ]
 }

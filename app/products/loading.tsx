@@ -1,6 +1,5 @@
-import { CatalogLoadingSkeleton } from '@/src/components/shared/catalog-skeleton'
+import { ProductsLoadingSkeleton } from '@/src/components/shared/page-skeletons'
 
 export default function ProductsLoading() {
-  return <CatalogLoadingSkeleton />
+  return <ProductsLoadingSkeleton />
 }
-

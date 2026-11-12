@@ -6,6 +6,7 @@ import { hasWorkspacePermission } from '@/src/lib/permissions/workspace'
 import { uuidSchema } from '@/src/lib/validation/catalog'
 import { requireDashboardWorkspace } from '@/src/lib/workspaces/dashboard-auth'
 import { CategoryService } from '@/src/services/category.service'
+import { InventoryService } from '@/src/services/inventory.service'
 import { ProductService } from '@/src/services/product.service'
 
 export const metadata: Metadata = {
@@ -55,6 +56,11 @@ export default async function ProductsPage({
     CategoryService.listCategories(ctx, { page: 1, pageSize: 100 }),
   ])
 
+  const stockByProductId = await InventoryService.listProductStocksMap(
+    ctx,
+    productsResult.items.map((item) => item.id),
+  )
+
   return (
     <DashboardShell
       workspaceName={workspace.name}
@@ -63,6 +69,7 @@ export default async function ProductsPage({
     >
       <ProductsView
         items={productsResult.items}
+        stockByProductId={stockByProductId}
         total={productsResult.total}
         page={productsResult.page}
         pageSize={productsResult.pageSize}

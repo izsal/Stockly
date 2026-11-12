@@ -106,32 +106,32 @@ Acceptance:
 ## Milestone 3 — Supplier and inventory core
 
 ### Database
-- [ ] Add suppliers.
-- [ ] Add warehouses (one default warehouse per workspace in MVP).
-- [ ] Add inventory_stocks.
-- [ ] Add inventory_movements.
-- [ ] Add constraints and indexes.
-- [ ] Add composite tenant-safe foreign keys where practical.
+- [x] Add suppliers.
+- [x] Add warehouses (one default warehouse per workspace in MVP).
+- [x] Add inventory_stocks.
+- [x] Add inventory_movements.
+- [x] Add constraints and indexes.
+- [x] Add composite tenant-safe foreign keys where practical.
 
 ### Inventory service
-- [ ] Implement `createStockIn`.
-- [ ] Implement `createStockOut`.
-- [ ] Implement `createAdjustment`.
-- [ ] Lock stock rows or use safe atomic conditional updates.
-- [ ] Update balance and insert movement in one transaction.
-- [ ] Reject negative stock.
-- [ ] Store before/delta/after quantities.
-- [ ] Record actor and reason.
-- [ ] Prevent editing/deleting movement history.
+- [x] Implement `createStockIn`.
+- [x] Implement `createStockOut`.
+- [x] Implement `createAdjustment`.
+- [x] Lock stock rows or use safe atomic conditional updates.
+- [x] Update balance and insert movement in one transaction.
+- [x] Reject negative stock.
+- [x] Store before/delta/after quantities.
+- [x] Record actor and reason.
+- [x] Prevent editing/deleting movement history.
 
 ### UI
-- [ ] Supplier CRUD.
-- [ ] Stock In form.
-- [ ] Stock Out form.
-- [ ] Stock Adjustment form.
-- [ ] Movement history table.
-- [ ] Product current-stock display.
-- [ ] Confirmation dialogs and toast feedback.
+- [x] Supplier CRUD.
+- [x] Stock In form.
+- [x] Stock Out form.
+- [x] Stock Adjustment form.
+- [x] Movement history table.
+- [x] Product current-stock display.
+- [x] Confirmation dialogs and toast feedback.
 
 Acceptance:
 - Stock in increases stock.

@@ -2,24 +2,33 @@
 
 import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
-import { Boxes, Menu, X } from 'lucide-react'
+import { Boxes, Building2, Menu, PanelLeftClose, PanelLeftOpen, X } from 'lucide-react'
+import { cn } from '@/lib/utils'
 import type { WorkspaceRole } from '@/src/lib/permissions/workspace'
 import { DashboardNav } from './dashboard-nav'
 import { LogoutButton } from './logout-button'
+import { toggleSidebarCollapsed, useSidebarCollapsed } from './sidebar-state'
 
-function Brand() {
+function Brand({ collapsed = false }: { collapsed?: boolean }) {
   return (
     <Link
       href="/dashboard"
-      className="flex items-center gap-3 rounded-lg focus-visible:outline-2 focus-visible:outline-ring"
+      title={collapsed ? 'Stockly' : undefined}
+      aria-label={collapsed ? 'Stockly' : undefined}
+      className={cn(
+        'flex items-center rounded-lg focus-visible:outline-2 focus-visible:outline-ring',
+        collapsed ? 'justify-center' : 'gap-3',
+      )}
     >
       <span
-        className="flex size-9 items-center justify-center rounded-xl bg-primary text-primary-foreground"
+        className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground"
         aria-hidden="true"
       >
         <Boxes className="size-[18px]" />
       </span>
-      <span className="text-lg font-semibold tracking-tight">Stockly</span>
+      <span className={cn('text-lg font-semibold tracking-tight', collapsed && 'sr-only')}>
+        Stockly
+      </span>
     </Link>
   )
 }
@@ -36,6 +45,7 @@ export function DashboardShell({
   role?: WorkspaceRole
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const collapsed = useSidebarCollapsed()
 
   const initials = userName
     .split(/\s+/)
@@ -47,17 +57,66 @@ export function DashboardShell({
   const roleLabel = role === 'OWNER' ? 'Akun pemilik' : 'Akun staf'
 
   return (
-    <div className="min-h-svh bg-background lg:grid lg:grid-cols-[248px_minmax(0,1fr)]">
-      <aside className="hidden border-r border-sidebar-border bg-sidebar px-5 py-6 lg:flex lg:flex-col">
-        <Brand />
-        <div className="mt-10">
-          <DashboardNav />
+    <div
+      className={cn(
+        'min-h-svh bg-background transition-[grid-template-columns] duration-200 lg:grid',
+        collapsed
+          ? 'lg:grid-cols-[72px_minmax(0,1fr)]'
+          : 'lg:grid-cols-[248px_minmax(0,1fr)]',
+      )}
+    >
+      <aside
+        className={cn(
+          'hidden border-r border-sidebar-border bg-sidebar py-6 transition-[padding] duration-200 lg:flex lg:flex-col',
+          collapsed ? 'px-3' : 'px-5',
+        )}
+      >
+        <div className={cn('flex items-center', collapsed ? 'justify-center' : 'justify-between')}>
+          <Brand collapsed={collapsed} />
         </div>
-        <div className="mt-auto rounded-xl border border-border bg-background p-4">
-          <p className="text-xs font-medium text-muted-foreground">Ruang kerja</p>
-          <p className="mt-1 truncate text-sm font-semibold" title={workspaceName}>
-            {workspaceName}
-          </p>
+
+        <div className="mt-8 flex-1 overflow-y-auto">
+          <DashboardNav collapsed={collapsed} />
+        </div>
+
+        <div className="mt-6 flex flex-col gap-2">
+          {collapsed ? (
+            <div
+              className="flex items-center justify-center rounded-xl border border-border bg-background p-2.5 text-muted-foreground"
+              title={`Ruang kerja: ${workspaceName}`}
+              aria-label={`Ruang kerja: ${workspaceName}`}
+            >
+              <Building2 className="size-4 shrink-0" aria-hidden="true" />
+            </div>
+          ) : (
+            <div className="rounded-xl border border-border bg-background p-4">
+              <p className="text-xs font-medium text-muted-foreground">Ruang kerja</p>
+              <p className="mt-1 truncate text-sm font-semibold" title={workspaceName}>
+                {workspaceName}
+              </p>
+            </div>
+          )}
+
+          <button
+            type="button"
+            onClick={toggleSidebarCollapsed}
+            title={collapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
+            aria-label={collapsed ? 'Perluas sidebar' : 'Ciutkan sidebar'}
+            aria-pressed={collapsed}
+            className={cn(
+              'flex items-center rounded-lg border border-transparent py-2 text-xs font-medium text-muted-foreground transition-colors hover:border-border hover:bg-background hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring',
+              collapsed ? 'justify-center px-2' : 'gap-2.5 px-3',
+            )}
+          >
+            {collapsed ? (
+              <PanelLeftOpen className="size-4 shrink-0" aria-hidden="true" />
+            ) : (
+              <>
+                <PanelLeftClose className="size-4 shrink-0" aria-hidden="true" />
+                <span>Sembunyikan label</span>
+              </>
+            )}
+          </button>
         </div>
       </aside>
 

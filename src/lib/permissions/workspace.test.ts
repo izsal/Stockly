@@ -3,23 +3,41 @@ import { DomainError } from '../errors'
 import { assertWorkspacePermission, hasWorkspacePermission } from './workspace'
 
 describe('workspace permissions', () => {
-  it('allows OWNER to read and write categories and products', () => {
+  it('allows OWNER to read and write all catalog, supplier, and inventory actions', () => {
     expect(hasWorkspacePermission('OWNER', 'categories:read')).toBe(true)
     expect(hasWorkspacePermission('OWNER', 'categories:write')).toBe(true)
     expect(hasWorkspacePermission('OWNER', 'products:read')).toBe(true)
     expect(hasWorkspacePermission('OWNER', 'products:write')).toBe(true)
+    expect(hasWorkspacePermission('OWNER', 'suppliers:read')).toBe(true)
+    expect(hasWorkspacePermission('OWNER', 'suppliers:write')).toBe(true)
+    expect(hasWorkspacePermission('OWNER', 'inventory:read')).toBe(true)
+    expect(hasWorkspacePermission('OWNER', 'inventory:write')).toBe(true)
+    expect(hasWorkspacePermission('OWNER', 'movements:read')).toBe(true)
   })
 
-  it('allows STAFF to read catalog but forbids catalog mutations', () => {
+  it('allows STAFF to read catalog/suppliers/movements and create inventory movements, but forbids master-data mutations', () => {
     expect(hasWorkspacePermission('STAFF', 'categories:read')).toBe(true)
     expect(hasWorkspacePermission('STAFF', 'products:read')).toBe(true)
+    expect(hasWorkspacePermission('STAFF', 'suppliers:read')).toBe(true)
+    expect(hasWorkspacePermission('STAFF', 'inventory:read')).toBe(true)
+    expect(hasWorkspacePermission('STAFF', 'inventory:write')).toBe(true)
+    expect(hasWorkspacePermission('STAFF', 'movements:read')).toBe(true)
+
     expect(hasWorkspacePermission('STAFF', 'categories:write')).toBe(false)
     expect(hasWorkspacePermission('STAFF', 'products:write')).toBe(false)
+    expect(hasWorkspacePermission('STAFF', 'suppliers:write')).toBe(false)
 
     expect(() =>
       assertWorkspacePermission(
         { userId: 'user-1', workspaceId: 'ws-1', role: 'STAFF' },
         'products:write',
+      ),
+    ).toThrowError(DomainError)
+
+    expect(() =>
+      assertWorkspacePermission(
+        { userId: 'user-1', workspaceId: 'ws-1', role: 'STAFF' },
+        'suppliers:write',
       ),
     ).toThrowError(DomainError)
   })
@@ -37,4 +55,3 @@ describe('workspace permissions', () => {
     }
   })
 })
-

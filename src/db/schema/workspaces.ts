@@ -63,6 +63,7 @@ export const warehouses = pgTable(
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },
   (table) => [
+    unique('warehouses_workspace_id_id_unique').on(table.workspaceId, table.id),
     uniqueIndex('warehouses_workspace_code_unique_idx')
       .on(table.workspaceId, table.code)
       .where(sql`${table.code} IS NOT NULL`),

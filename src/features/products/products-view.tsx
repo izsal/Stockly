@@ -42,6 +42,7 @@ type StatusFilter = 'active' | 'archived' | 'all'
 
 export function ProductsView({
   items,
+  stockByProductId,
   total,
   page,
   pageSize,
@@ -53,6 +54,7 @@ export function ProductsView({
   canWrite,
 }: {
   items: ProductItem[]
+  stockByProductId: Record<string, number>
   total: number
   page: number
   pageSize: number
@@ -256,6 +258,7 @@ export function ProductsView({
                 <TableHead>Produk</TableHead>
                 <TableHead>SKU</TableHead>
                 <TableHead>Kategori</TableHead>
+                <TableHead>Stok Saat Ini</TableHead>
                 <TableHead>Stok Min.</TableHead>
                 <TableHead>Harga Modal</TableHead>
                 <TableHead>Harga Jual</TableHead>
@@ -266,6 +269,13 @@ export function ProductsView({
             <TableBody>
               {items.map((product) => {
                 const isArchived = !product.isActive || Boolean(product.deletedAt)
+                const currentStock = stockByProductId[product.id] ?? 0
+                const stockBadgeVariant =
+                  currentStock === 0
+                    ? 'destructive'
+                    : currentStock <= product.minimumStock
+                      ? 'warning'
+                      : 'secondary'
 
                 return (
                   <TableRow key={product.id}>
@@ -282,6 +292,11 @@ export function ProductsView({
                     <TableCell className="font-mono text-xs font-medium">{product.sku}</TableCell>
                     <TableCell className="text-muted-foreground">
                       {product.categoryName ?? 'Tanpa kategori'}
+                    </TableCell>
+                    <TableCell className="whitespace-nowrap">
+                      <Badge variant={stockBadgeVariant}>
+                        {currentStock} {product.unit}
+                      </Badge>
                     </TableCell>
                     <TableCell className="whitespace-nowrap">
                       {product.minimumStock} {product.unit}

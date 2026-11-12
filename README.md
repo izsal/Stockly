@@ -1,6 +1,6 @@
 # Stockly
 
-Stockly is an inventory-management app for Indonesian businesses. The current implementation covers the Foundation milestone (email/password authentication, protected workspace dashboard, owner membership, and default warehouse) and Milestone 2 (workspace-scoped product and category management).
+Stockly is an inventory-management app for Indonesian businesses. The current implementation covers the Foundation milestone (email/password authentication, protected workspace dashboard, owner membership, and default warehouse), Milestone 2 (workspace-scoped product and category management), and Milestone 3 (supplier CRUD, atomic stock in/out/adjustment movements with row-level locking, current-stock display, and append-only movement history).
 
 ## Project structure
 
@@ -35,4 +35,4 @@ Better Auth owns password hashing and session management. The dashboard resolves
 
 ## Product scope
 
-See `PRD.md` for the Foundation acceptance criteria and `TASKS.md` for milestone progress. Stock movement, supplier, and reporting features belong to upcoming milestones.
+See `PRD.md` for the Foundation acceptance criteria and `TASKS.md` for milestone progress. Dashboard aggregates and reporting features belong to upcoming Milestone 4.

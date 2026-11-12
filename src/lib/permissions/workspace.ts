@@ -13,12 +13,22 @@ export type WorkspaceAction =
   | 'categories:write'
   | 'products:read'
   | 'products:write'
+  | 'suppliers:read'
+  | 'suppliers:write'
+  | 'inventory:read'
+  | 'inventory:write'
+  | 'movements:read'
 
 const WORKSPACE_PERMISSIONS: Record<WorkspaceAction, readonly WorkspaceRole[]> = {
   'categories:read': ['OWNER', 'STAFF'],
   'categories:write': ['OWNER'],
   'products:read': ['OWNER', 'STAFF'],
   'products:write': ['OWNER'],
+  'suppliers:read': ['OWNER', 'STAFF'],
+  'suppliers:write': ['OWNER'],
+  'inventory:read': ['OWNER', 'STAFF'],
+  'inventory:write': ['OWNER', 'STAFF'],
+  'movements:read': ['OWNER', 'STAFF'],
 }
 
 export function hasWorkspacePermission(role: WorkspaceRole, action: WorkspaceAction): boolean {
@@ -34,4 +44,3 @@ export function assertWorkspacePermission(ctx: WorkspaceContext, action: Workspa
     throw new DomainError('FORBIDDEN', 'Anda tidak memiliki izin untuk melakukan tindakan ini.')
   }
 }
-
