@@ -69,7 +69,7 @@ export const listSuppliersQuerySchema = z.object({
     .optional()
     .transform((value) => normalizeOptionalText(value)),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  pageSize: z.coerce.number().int().min(1).max(100).default(10),
 })
 
 export const stockInSchema = z.object({
@@ -150,7 +150,7 @@ export const listMovementsQuerySchema = z.object({
     .optional()
     .transform((value) => normalizeOptionalText(value)),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  pageSize: z.coerce.number().int().min(1).max(100).default(10),
 })
 
 export type SupplierInput = z.input<typeof supplierInputSchema>

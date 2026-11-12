@@ -4,6 +4,7 @@ import { MissingWorkspaceState } from '@/src/components/app/missing-workspace-ca
 import { ProductsView } from '@/src/features/products/products-view'
 import { hasWorkspacePermission } from '@/src/lib/permissions/workspace'
 import { uuidSchema } from '@/src/lib/validation/catalog'
+import { parsePageSizeParam } from '@/src/lib/validation/pagination'
 import { requireDashboardWorkspace } from '@/src/lib/workspaces/dashboard-auth'
 import { CategoryService } from '@/src/services/category.service'
 import { InventoryService } from '@/src/services/inventory.service'
@@ -38,6 +39,7 @@ export default async function ProductsPage({
 
   const rawPage = typeof resolvedParams.page === 'string' ? Number(resolvedParams.page) : 1
   const page = Number.isInteger(rawPage) && rawPage >= 1 ? rawPage : 1
+  const pageSize = parsePageSizeParam(resolvedParams.pageSize, 10)
 
   const ctx = {
     userId: session.user.id,
@@ -51,7 +53,7 @@ export default async function ProductsPage({
       categoryId: validCategoryId || undefined,
       status,
       page,
-      pageSize: 10,
+      pageSize,
     }),
     CategoryService.listCategories(ctx, { page: 1, pageSize: 100 }),
   ])

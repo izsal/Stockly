@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { SearchableSelect } from '@/components/ui/searchable-select'
 import { ModernSelect } from '@/components/ui/select'
 import {
   Table,
@@ -28,6 +29,7 @@ import {
 import { EmptyState } from '@/src/components/shared/empty-state'
 import { PageHeader } from '@/src/components/shared/page-header'
 import { TablePagination } from '@/src/components/shared/table-pagination'
+import { useDebouncedSearch } from '@/src/lib/hooks/use-debounced-search'
 import {
   STOCK_OUT_REASON_LABELS,
   type MovementType,
@@ -119,6 +121,7 @@ export function MovementsView({
     dateFrom?: string
     dateTo?: string
     page?: number
+    pageSize?: number
   }) {
     const params = new URLSearchParams()
     const searchVal = (next.search ?? initialSearch).trim()
@@ -127,6 +130,7 @@ export function MovementsView({
     const fromVal = next.dateFrom ?? initialDateFrom
     const toVal = next.dateTo ?? initialDateTo
     const pageVal = next.page ?? 1
+    const pageSizeVal = next.pageSize ?? pageSize
 
     if (searchVal) params.set('search', searchVal)
     if (productVal) params.set('productId', productVal)
@@ -134,10 +138,15 @@ export function MovementsView({
     if (fromVal) params.set('dateFrom', fromVal)
     if (toVal) params.set('dateTo', toVal)
     if (pageVal > 1) params.set('page', String(pageVal))
+    if (pageSizeVal !== 10) params.set('pageSize', String(pageSizeVal))
 
     const queryString = params.toString()
     router.push(queryString ? `/movements?${queryString}` : '/movements')
   }
+
+  useDebouncedSearch(searchInput, initialSearch, (nextSearch) => {
+    navigateWithParams({ search: nextSearch, page: 1 })
+  })
 
   function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -215,17 +224,20 @@ export function MovementsView({
               className="w-full min-w-0"
             />
 
-            <ModernSelect
+            <SearchableSelect
               ariaLabel="Filter produk"
               value={initialProductId}
               onValueChange={(nextValue) =>
                 navigateWithParams({ productId: nextValue, page: 1 })
               }
+              searchPlaceholder="Cari nama atau SKU produk…"
+              emptyMessage="Produk tidak ditemukan."
               options={[
                 { value: '', label: 'Semua produk' },
                 ...products.map((product) => ({
                   value: product.id,
                   label: `${product.name} (${product.sku})`,
+                  searchText: `${product.name} ${product.sku}`,
                 })),
               ]}
               className="w-full min-w-0"
@@ -396,6 +408,9 @@ export function MovementsView({
             total={total}
             pageSize={pageSize}
             onPageChange={(nextPage) => navigateWithParams({ page: nextPage })}
+            onPageSizeChange={(nextPageSize) =>
+              navigateWithParams({ pageSize: nextPageSize, page: 1 })
+            }
           />
         </Card>
       )}

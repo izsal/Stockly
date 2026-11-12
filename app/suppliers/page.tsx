@@ -3,6 +3,7 @@ import { DashboardShell } from '@/src/components/app/dashboard-shell'
 import { MissingWorkspaceState } from '@/src/components/app/missing-workspace-card'
 import { SuppliersView } from '@/src/features/suppliers/suppliers-view'
 import { hasWorkspacePermission } from '@/src/lib/permissions/workspace'
+import { parsePageSizeParam } from '@/src/lib/validation/pagination'
 import { requireDashboardWorkspace } from '@/src/lib/workspaces/dashboard-auth'
 import { SupplierService } from '@/src/services/supplier.service'
 
@@ -25,6 +26,7 @@ export default async function SuppliersPage({
   const search = typeof resolvedParams.search === 'string' ? resolvedParams.search : ''
   const rawPage = typeof resolvedParams.page === 'string' ? Number(resolvedParams.page) : 1
   const page = Number.isInteger(rawPage) && rawPage >= 1 ? rawPage : 1
+  const pageSize = parsePageSizeParam(resolvedParams.pageSize, 10)
 
   const ctx = {
     userId: session.user.id,
@@ -35,7 +37,7 @@ export default async function SuppliersPage({
   const result = await SupplierService.listSuppliers(ctx, {
     search: search || undefined,
     page,
-    pageSize: 10,
+    pageSize,
   })
 
   return (

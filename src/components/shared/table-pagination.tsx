@@ -2,6 +2,9 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { ModernSelect } from '@/components/ui/select'
+
+const DEFAULT_PAGE_SIZE_OPTIONS = [10, 20, 50] as const
 
 export function TablePagination({
   page,
@@ -9,12 +12,16 @@ export function TablePagination({
   total,
   pageSize,
   onPageChange,
+  onPageSizeChange,
+  pageSizeOptions = DEFAULT_PAGE_SIZE_OPTIONS,
 }: {
   page: number
   totalPages: number
   total: number
   pageSize: number
   onPageChange: (nextPage: number) => void
+  onPageSizeChange?: (nextPageSize: number) => void
+  pageSizeOptions?: readonly number[]
 }) {
   if (total === 0) return null
 
@@ -23,11 +30,30 @@ export function TablePagination({
 
   return (
     <div className="flex flex-col gap-3 border-t border-border px-4 py-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
-      <p>
-        Menampilkan <span className="font-medium text-foreground">{start}</span>–
-        <span className="font-medium text-foreground">{end}</span> dari{' '}
-        <span className="font-medium text-foreground">{total}</span> data
-      </p>
+      <div className="flex flex-wrap items-center gap-3">
+        <p>
+          Menampilkan <span className="font-medium text-foreground">{start}</span>–
+          <span className="font-medium text-foreground">{end}</span> dari{' '}
+          <span className="font-medium text-foreground">{total}</span> data
+        </p>
+
+        {onPageSizeChange ? (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-muted-foreground">Per halaman</span>
+            <ModernSelect
+              ariaLabel="Jumlah baris per halaman"
+              value={String(pageSize)}
+              onValueChange={(next) => onPageSizeChange(Number(next))}
+              options={pageSizeOptions.map((size) => ({
+                value: String(size),
+                label: `${size}`,
+              }))}
+              className="w-20"
+            />
+          </div>
+        ) : null}
+      </div>
+
       <div className="flex items-center gap-2">
         <Button
           type="button"
@@ -56,4 +82,3 @@ export function TablePagination({
     </div>
   )
 }
-

@@ -63,13 +63,13 @@ export function DashboardShell({
       className={cn(
         'min-h-svh bg-background transition-[grid-template-columns] duration-200 lg:grid',
         collapsed
-          ? 'lg:grid-cols-[72px_minmax(0,1fr)]'
-          : 'lg:grid-cols-[248px_minmax(0,1fr)]',
+          ? 'lg:grid-cols-[72px_minmax(0,1fr)] print:block'
+          : 'lg:grid-cols-[248px_minmax(0,1fr)] print:block',
       )}
     >
       <aside
         className={cn(
-          'hidden border-r border-sidebar-border bg-sidebar py-6 transition-[padding] duration-200 lg:flex lg:flex-col',
+          'hidden border-r border-sidebar-border bg-sidebar py-6 transition-[padding] duration-200 lg:flex lg:flex-col print:hidden',
           collapsed ? 'px-3' : 'px-5',
         )}
       >
@@ -125,7 +125,7 @@ export function DashboardShell({
       </aside>
 
       <div className="min-w-0">
-        <header className="border-b border-border bg-card/90">
+        <header className="border-b border-border bg-card/90 print:hidden">
           <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6 lg:px-10">
             <div className="flex min-w-0 items-center gap-3">
               <div className="relative lg:hidden">

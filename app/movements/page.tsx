@@ -4,6 +4,7 @@ import { MissingWorkspaceState } from '@/src/components/app/missing-workspace-ca
 import { MovementsView } from '@/src/features/inventory/movements-view'
 import { uuidSchema } from '@/src/lib/validation/catalog'
 import { MOVEMENT_TYPES, type MovementType } from '@/src/lib/validation/inventory'
+import { parsePageSizeParam } from '@/src/lib/validation/pagination'
 import { requireDashboardWorkspace } from '@/src/lib/workspaces/dashboard-auth'
 import { InventoryService } from '@/src/services/inventory.service'
 import { ProductService } from '@/src/services/product.service'
@@ -48,6 +49,7 @@ export default async function MovementsPage({
 
   const rawPage = typeof resolvedParams.page === 'string' ? Number(resolvedParams.page) : 1
   const page = Number.isInteger(rawPage) && rawPage >= 1 ? rawPage : 1
+  const pageSize = parsePageSizeParam(resolvedParams.pageSize, 10)
 
   const ctx = {
     userId: session.user.id,
@@ -63,7 +65,7 @@ export default async function MovementsPage({
       dateFrom: rawDateFrom || undefined,
       dateTo: rawDateTo || undefined,
       page,
-      pageSize: 10,
+      pageSize,
     }),
     ProductService.listProducts(ctx, { status: 'all', page: 1, pageSize: 100 }),
   ])

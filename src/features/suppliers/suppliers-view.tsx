@@ -20,6 +20,7 @@ import { ConfirmDialog } from '@/src/components/shared/confirm-dialog'
 import { EmptyState } from '@/src/components/shared/empty-state'
 import { PageHeader } from '@/src/components/shared/page-header'
 import { TablePagination } from '@/src/components/shared/table-pagination'
+import { useDebouncedSearch } from '@/src/lib/hooks/use-debounced-search'
 import { SupplierFormDialog, type SupplierItem } from './supplier-form-dialog'
 
 export function SuppliersView({
@@ -46,14 +47,23 @@ export function SuppliersView({
   const [deletingSupplier, setDeletingSupplier] = useState<SupplierItem | null>(null)
   const [deletePending, setDeletePending] = useState(false)
 
-  function navigateWithParams(nextSearch: string, nextPage: number) {
+  function navigateWithParams(
+    nextSearch: string,
+    nextPage: number,
+    nextPageSize = pageSize,
+  ) {
     const params = new URLSearchParams()
     const trimmed = nextSearch.trim()
     if (trimmed) params.set('search', trimmed)
     if (nextPage > 1) params.set('page', String(nextPage))
+    if (nextPageSize !== 10) params.set('pageSize', String(nextPageSize))
     const queryString = params.toString()
     router.push(queryString ? `/suppliers?${queryString}` : '/suppliers')
   }
+
+  useDebouncedSearch(searchInput, initialSearch, (nextSearch) => {
+    navigateWithParams(nextSearch, 1)
+  })
 
   function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -244,6 +254,9 @@ export function SuppliersView({
             total={total}
             pageSize={pageSize}
             onPageChange={(nextPage) => navigateWithParams(initialSearch, nextPage)}
+            onPageSizeChange={(nextPageSize) =>
+              navigateWithParams(initialSearch, 1, nextPageSize)
+            }
           />
         </Card>
       )}

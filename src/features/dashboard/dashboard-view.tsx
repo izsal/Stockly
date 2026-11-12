@@ -26,6 +26,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { formatRupiah } from '@/src/lib/format'
 import type { MovementType } from '@/src/lib/validation/inventory'
 import { getDefaultDateRange } from '@/src/lib/validation/reports'
 
@@ -35,6 +36,7 @@ type DashboardSummaryData = {
   kpis: {
     totalActiveProducts: number
     totalStockUnits: number
+    totalInventoryValue: number
     lowStockProducts: number
     outOfStockProducts: number
   }
@@ -285,9 +287,12 @@ export function DashboardView({
               </p>
             </div>
           </CardHeader>
-          <CardContent className="px-5 pb-5">
+          <CardContent className="space-y-1 px-5 pb-5">
+            <p className="text-xs font-medium text-foreground">
+              Nilai aset: {formatRupiah(kpis.totalInventoryValue)}
+            </p>
             <p className="text-xs text-muted-foreground">
-              Total jumlah seluruh unit produk aktif ({defaultWarehouse?.name ?? 'Gudang Utama'})
+              Total unit produk aktif ({defaultWarehouse?.name ?? 'Gudang Utama'})
             </p>
           </CardContent>
         </Card>
@@ -579,6 +584,13 @@ export function DashboardView({
                         {product.status === 'OUT' ? 'Habis' : 'Menipis'} ({product.currentStock}{' '}
                         {product.unit})
                       </Badge>
+                      <Link
+                        href={`/inventory/stock-in?productId=${product.id}`}
+                        className="inline-flex h-7 items-center gap-1 rounded-md border border-border bg-background px-2 text-xs font-medium text-primary transition-colors hover:bg-muted"
+                      >
+                        <PackagePlus className="size-3" aria-hidden="true" />
+                        Isi stok
+                      </Link>
                     </div>
                   </div>
                 ))}

@@ -91,7 +91,7 @@ export const currentStockReportQuerySchema = z.object({
   categoryId: optionalUuidSchema.optional(),
   stockStatus: z.enum(STOCK_STATUS_FILTERS).optional().default('all'),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  pageSize: z.coerce.number().int().min(1).max(100).default(10),
 })
 
 export const lowStockReportQuerySchema = z.object({
@@ -101,7 +101,7 @@ export const lowStockReportQuerySchema = z.object({
     .transform((value) => normalizeOptionalText(value)),
   categoryId: optionalUuidSchema.optional(),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  pageSize: z.coerce.number().int().min(1).max(100).default(10),
 })
 
 export const movementReportQuerySchema = z.object({
@@ -117,7 +117,7 @@ export const movementReportQuerySchema = z.object({
     .optional()
     .transform((value) => normalizeOptionalText(value)),
   page: z.coerce.number().int().min(1).default(1),
-  pageSize: z.coerce.number().int().min(1).max(100).default(20),
+  pageSize: z.coerce.number().int().min(1).max(100).default(10),
 })
 
 export const reportExportQuerySchema = z.object({

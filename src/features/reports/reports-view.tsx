@@ -13,6 +13,7 @@ import {
   ClipboardCheck,
   Download,
   Package,
+  Printer,
   Search,
   X,
 } from 'lucide-react'
@@ -20,6 +21,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { SearchableSelect } from '@/components/ui/searchable-select'
 import { ModernSelect } from '@/components/ui/select'
 import {
   Table,
@@ -33,6 +35,7 @@ import { EmptyState } from '@/src/components/shared/empty-state'
 import { PageHeader } from '@/src/components/shared/page-header'
 import { TablePagination } from '@/src/components/shared/table-pagination'
 import { formatRupiah } from '@/src/lib/format'
+import { useDebouncedSearch } from '@/src/lib/hooks/use-debounced-search'
 import {
   STOCK_OUT_REASON_LABELS,
   type MovementType,
@@ -176,6 +179,9 @@ export function ReportsView({
   const router = useRouter()
   const [searchInput, setSearchInput] = useState(initialSearch)
 
+  const activePageSize =
+    currentStockData?.pageSize ?? lowStockData?.pageSize ?? movementData?.pageSize ?? 10
+
   function buildQueryParams(
     overrides: Partial<{
       tab: ReportTab
@@ -187,6 +193,7 @@ export function ReportsView({
       dateFrom: string
       dateTo: string
       page: number
+      pageSize: number
     }> = {},
   ) {
     const nextTab = overrides.tab ?? tab
@@ -220,12 +227,19 @@ export function ReportsView({
     const pageVal = overrides.page ?? 1
     if (pageVal > 1) params.set('page', String(pageVal))
 
+    const pageSizeVal = overrides.pageSize ?? activePageSize
+    if (pageSizeVal !== 10) params.set('pageSize', String(pageSizeVal))
+
     return params.toString()
   }
 
   function navigateWith(overrides: Parameters<typeof buildQueryParams>[0]) {
     router.push(`/reports?${buildQueryParams(overrides)}`)
   }
+
+  useDebouncedSearch(searchInput, initialSearch, (nextSearch) => {
+    navigateWith({ search: nextSearch, page: 1 })
+  })
 
   function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -271,14 +285,25 @@ export function ReportsView({
         title="Laporan"
         description="Analisis stok saat ini, produk menipis, pergerakan periode tertentu, dan ekspor CSV."
         action={
-          <a
-            href={buildExportHref()}
-            download
-            className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            <Download className="size-4" aria-hidden="true" />
-            Ekspor CSV
-          </a>
+          <div className="flex flex-wrap items-center gap-2 print:hidden">
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={() => window.print()}
+            >
+              <Printer data-icon="inline-start" />
+              Cetak / PDF
+            </Button>
+            <a
+              href={buildExportHref()}
+              download
+              className="inline-flex h-9 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            >
+              <Download className="size-4" aria-hidden="true" />
+              Ekspor CSV
+            </a>
+          </div>
         }
       />
 
@@ -360,15 +385,18 @@ export function ReportsView({
                 className="w-full min-w-0"
               />
 
-              <ModernSelect
+              <SearchableSelect
                 ariaLabel="Filter produk"
                 value={initialProductId}
                 onValueChange={(nextValue) => navigateWith({ productId: nextValue, page: 1 })}
+                searchPlaceholder="Cari nama atau SKU produk…"
+                emptyMessage="Produk tidak ditemukan."
                 options={[
                   { value: '', label: 'Semua produk' },
                   ...products.map((product) => ({
                     value: product.id,
                     label: `${product.name} (${product.sku})`,
+                    searchText: `${product.name} ${product.sku}`,
                   })),
                 ]}
                 className="w-full min-w-0"
@@ -537,6 +565,9 @@ export function ReportsView({
                 total={currentStockData.total}
                 pageSize={currentStockData.pageSize}
                 onPageChange={(nextPage) => navigateWith({ page: nextPage })}
+                onPageSizeChange={(nextPageSize) =>
+                  navigateWith({ pageSize: nextPageSize, page: 1 })
+                }
               />
             </Card>
           )}
@@ -612,6 +643,9 @@ export function ReportsView({
                 total={lowStockData.total}
                 pageSize={lowStockData.pageSize}
                 onPageChange={(nextPage) => navigateWith({ page: nextPage })}
+                onPageSizeChange={(nextPageSize) =>
+                  navigateWith({ pageSize: nextPageSize, page: 1 })
+                }
               />
             </Card>
           )}
@@ -787,6 +821,9 @@ export function ReportsView({
                 total={movementData.total}
                 pageSize={movementData.pageSize}
                 onPageChange={(nextPage) => navigateWith({ page: nextPage })}
+                onPageSizeChange={(nextPageSize) =>
+                  navigateWith({ pageSize: nextPageSize, page: 1 })
+                }
               />
             </Card>
           )}

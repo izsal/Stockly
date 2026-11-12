@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { ModernSelect } from '@/components/ui/select'
+import { SearchableSelect } from '@/components/ui/searchable-select'
 import { Textarea } from '@/components/ui/textarea'
 import { createStockInAction } from '@/src/actions/inventory.actions'
 import { ConfirmDialog } from '@/src/components/shared/confirm-dialog'
@@ -22,12 +22,18 @@ import type { InventoryProductOption, InventorySupplierOption } from './types'
 export function StockInForm({
   products,
   suppliers,
+  initialProductId,
 }: {
   products: InventoryProductOption[]
   suppliers: InventorySupplierOption[]
+  initialProductId?: string
 }) {
   const router = useRouter()
-  const [productId, setProductId] = useState(products[0]?.id ?? '')
+  const resolvedInitialProductId =
+    initialProductId && products.some((p) => p.id === initialProductId)
+      ? initialProductId
+      : (products[0]?.id ?? '')
+  const [productId, setProductId] = useState(resolvedInitialProductId)
   const [quantity, setQuantity] = useState('')
   const [supplierId, setSupplierId] = useState('')
   const [referenceNumber, setReferenceNumber] = useState('')
@@ -152,18 +158,21 @@ export function StockInForm({
                 <FieldGroup>
                   <Field data-invalid={Boolean(fieldErrors.productId)}>
                     <FieldLabel htmlFor="stock-in-product">Produk *</FieldLabel>
-                    <ModernSelect
+                    <SearchableSelect
                       id="stock-in-product"
                       name="productId"
                       value={productId}
                       onValueChange={setProductId}
                       disabled={pending}
                       placeholder="Pilih produk…"
+                      searchPlaceholder="Cari nama atau SKU produk…"
+                      emptyMessage="Produk tidak ditemukan."
                       options={[
                         { value: '', label: 'Pilih produk…' },
                         ...products.map((product) => ({
                           value: product.id,
                           label: `${product.name} (${product.sku}) — Stok: ${product.currentStock} ${product.unit}`,
+                          searchText: `${product.name} ${product.sku}`,
                         })),
                       ]}
                     />
@@ -199,12 +208,14 @@ export function StockInForm({
 
                     <Field data-invalid={Boolean(fieldErrors.supplierId)}>
                       <FieldLabel htmlFor="stock-in-supplier">Supplier (opsional)</FieldLabel>
-                      <ModernSelect
+                      <SearchableSelect
                         id="stock-in-supplier"
                         name="supplierId"
                         value={supplierId}
                         onValueChange={setSupplierId}
                         disabled={pending}
+                        searchPlaceholder="Cari nama supplier…"
+                        emptyMessage="Supplier tidak ditemukan."
                         options={[
                           { value: '', label: 'Tanpa supplier' },
                           ...suppliers.map((supplier) => ({

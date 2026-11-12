@@ -3,6 +3,7 @@ import { DashboardShell } from '@/src/components/app/dashboard-shell'
 import { MissingWorkspaceState } from '@/src/components/app/missing-workspace-card'
 import { CategoriesView } from '@/src/features/categories/categories-view'
 import { hasWorkspacePermission } from '@/src/lib/permissions/workspace'
+import { parsePageSizeParam } from '@/src/lib/validation/pagination'
 import { requireDashboardWorkspace } from '@/src/lib/workspaces/dashboard-auth'
 import { CategoryService } from '@/src/services/category.service'
 
@@ -25,6 +26,7 @@ export default async function CategoriesPage({
   const search = typeof resolvedParams.search === 'string' ? resolvedParams.search : ''
   const rawPage = typeof resolvedParams.page === 'string' ? Number(resolvedParams.page) : 1
   const page = Number.isInteger(rawPage) && rawPage >= 1 ? rawPage : 1
+  const pageSize = parsePageSizeParam(resolvedParams.pageSize, 10)
 
   const ctx = {
     userId: session.user.id,
@@ -35,7 +37,7 @@ export default async function CategoriesPage({
   const result = await CategoryService.listCategories(ctx, {
     search: search || undefined,
     page,
-    pageSize: 10,
+    pageSize,
   })
 
   return (

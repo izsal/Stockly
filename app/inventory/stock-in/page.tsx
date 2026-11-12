@@ -11,11 +11,19 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export default async function StockInPage() {
+export default async function StockInPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
   const { session, workspace } = await requireDashboardWorkspace()
   if (!workspace) {
     return <MissingWorkspaceState userName={session.user.name} />
   }
+
+  const resolvedParams = await searchParams
+  const initialProductId =
+    typeof resolvedParams.productId === 'string' ? resolvedParams.productId : undefined
 
   const ctx = {
     userId: session.user.id,
@@ -37,6 +45,7 @@ export default async function StockInPage() {
       <StockInForm
         products={products}
         suppliers={suppliersResult.items.map((s) => ({ id: s.id, name: s.name }))}
+        initialProductId={initialProductId}
       />
     </DashboardShell>
   )

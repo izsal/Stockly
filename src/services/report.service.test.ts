@@ -113,6 +113,7 @@ describe('ReportService', () => {
     expect(summary.kpis).toEqual({
       totalActiveProducts: 12,
       totalStockUnits: 145,
+      totalInventoryValue: 0,
       lowStockProducts: 3,
       outOfStockProducts: 1,
     })

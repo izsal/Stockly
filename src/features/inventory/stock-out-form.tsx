@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
+import { SearchableSelect } from '@/components/ui/searchable-select'
 import { ModernSelect } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { createStockOutAction } from '@/src/actions/inventory.actions'
@@ -24,9 +25,19 @@ import {
 import { StockPreviewCard } from './stock-preview-card'
 import type { InventoryProductOption } from './types'
 
-export function StockOutForm({ products }: { products: InventoryProductOption[] }) {
+export function StockOutForm({
+  products,
+  initialProductId,
+}: {
+  products: InventoryProductOption[]
+  initialProductId?: string
+}) {
   const router = useRouter()
-  const [productId, setProductId] = useState(products[0]?.id ?? '')
+  const resolvedInitialProductId =
+    initialProductId && products.some((p) => p.id === initialProductId)
+      ? initialProductId
+      : (products[0]?.id ?? '')
+  const [productId, setProductId] = useState(resolvedInitialProductId)
   const [quantity, setQuantity] = useState('')
   const [reason, setReason] = useState<StockOutReason>('SALE')
   const [referenceNumber, setReferenceNumber] = useState('')
@@ -158,18 +169,21 @@ export function StockOutForm({ products }: { products: InventoryProductOption[] 
                 <FieldGroup>
                   <Field data-invalid={Boolean(fieldErrors.productId)}>
                     <FieldLabel htmlFor="stock-out-product">Produk *</FieldLabel>
-                    <ModernSelect
+                    <SearchableSelect
                       id="stock-out-product"
                       name="productId"
                       value={productId}
                       onValueChange={setProductId}
                       disabled={pending}
                       placeholder="Pilih produk…"
+                      searchPlaceholder="Cari nama atau SKU produk…"
+                      emptyMessage="Produk tidak ditemukan."
                       options={[
                         { value: '', label: 'Pilih produk…' },
                         ...products.map((product) => ({
                           value: product.id,
                           label: `${product.name} (${product.sku}) — Tersedia: ${product.currentStock} ${product.unit}`,
+                          searchText: `${product.name} ${product.sku}`,
                         })),
                       ]}
                     />

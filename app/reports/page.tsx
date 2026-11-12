@@ -4,6 +4,7 @@ import { MissingWorkspaceState } from '@/src/components/app/missing-workspace-ca
 import { ReportsView } from '@/src/features/reports/reports-view'
 import { uuidSchema } from '@/src/lib/validation/catalog'
 import { MOVEMENT_TYPES, type MovementType } from '@/src/lib/validation/inventory'
+import { parsePageSizeParam } from '@/src/lib/validation/pagination'
 import {
   REPORT_TABS,
   STOCK_STATUS_FILTERS,
@@ -72,6 +73,7 @@ export default async function ReportsPage({
 
   const rawPage = typeof resolvedParams.page === 'string' ? Number(resolvedParams.page) : 1
   const page = Number.isInteger(rawPage) && rawPage >= 1 ? rawPage : 1
+  const pageSize = parsePageSizeParam(resolvedParams.pageSize, 10)
 
   const ctx = {
     userId: session.user.id,
@@ -89,7 +91,7 @@ export default async function ReportsPage({
           categoryId: validCategoryId || undefined,
           stockStatus,
           page,
-          pageSize: 10,
+          pageSize,
         })
         : Promise.resolve(null),
       tab === 'low-stock'
@@ -97,7 +99,7 @@ export default async function ReportsPage({
           search: search || undefined,
           categoryId: validCategoryId || undefined,
           page,
-          pageSize: 10,
+          pageSize,
         })
         : Promise.resolve(null),
       tab === 'movements'
@@ -108,7 +110,7 @@ export default async function ReportsPage({
           dateFrom: dateFrom || undefined,
           dateTo: dateTo || undefined,
           page,
-          pageSize: 10,
+          pageSize,
         })
         : Promise.resolve(null),
     ])

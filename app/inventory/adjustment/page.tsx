@@ -10,11 +10,19 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 }
 
-export default async function StockAdjustmentPage() {
+export default async function StockAdjustmentPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>
+}) {
   const { session, workspace } = await requireDashboardWorkspace()
   if (!workspace) {
     return <MissingWorkspaceState userName={session.user.name} />
   }
+
+  const resolvedParams = await searchParams
+  const initialProductId =
+    typeof resolvedParams.productId === 'string' ? resolvedParams.productId : undefined
 
   const ctx = {
     userId: session.user.id,
@@ -30,7 +38,7 @@ export default async function StockAdjustmentPage() {
       userName={session.user.name}
       role={workspace.role}
     >
-      <StockAdjustmentForm products={products} />
+      <StockAdjustmentForm products={products} initialProductId={initialProductId} />
     </DashboardShell>
   )
 }

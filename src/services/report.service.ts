@@ -137,6 +137,7 @@ export async function getDashboardSummary(
       .select({
         totalActiveProducts: count(products.id),
         totalStockUnits: sql<number>`coalesce(sum(${stockQtyExpr}), 0)::int`,
+        totalInventoryValue: sql<string>`coalesce(sum(${stockQtyExpr} * coalesce(${products.costPrice}, 0)), 0)::numeric(14,2)::text`,
         lowStockProducts: sql<number>`count(*) filter (where ${stockQtyExpr} <= ${products.minimumStock})::int`,
         outOfStockProducts: sql<number>`count(*) filter (where ${stockQtyExpr} = 0)::int`,
       })
@@ -210,6 +211,7 @@ export async function getDashboardSummary(
     kpis: {
       totalActiveProducts: Number(kpis?.totalActiveProducts ?? 0),
       totalStockUnits: Number(kpis?.totalStockUnits ?? 0),
+      totalInventoryValue: Number(kpis?.totalInventoryValue ?? 0),
       lowStockProducts: Number(kpis?.lowStockProducts ?? 0),
       outOfStockProducts: Number(kpis?.outOfStockProducts ?? 0),
     },

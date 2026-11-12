@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type FormEvent } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { toast } from '@yusufceng1z/ding-react'
 import {
@@ -8,6 +9,8 @@ import {
   ArchiveRestore,
   CheckCircle2,
   Package,
+  PackageMinus,
+  PackagePlus,
   Pencil,
   Plus,
   Search,
@@ -32,6 +35,7 @@ import { EmptyState } from '@/src/components/shared/empty-state'
 import { PageHeader } from '@/src/components/shared/page-header'
 import { TablePagination } from '@/src/components/shared/table-pagination'
 import { formatRupiah } from '@/src/lib/format'
+import { useDebouncedSearch } from '@/src/lib/hooks/use-debounced-search'
 import {
   ProductFormDialog,
   type CategoryOption,
@@ -80,21 +84,28 @@ export function ProductsView({
     categoryId?: string
     status?: StatusFilter
     page?: number
+    pageSize?: number
   }) {
     const params = new URLSearchParams()
     const searchValue = (next.search ?? initialSearch).trim()
     const categoryValue = next.categoryId ?? initialCategoryId
     const statusValue = next.status ?? initialStatus
     const pageValue = next.page ?? 1
+    const pageSizeValue = next.pageSize ?? pageSize
 
     if (searchValue) params.set('search', searchValue)
     if (categoryValue) params.set('categoryId', categoryValue)
     if (statusValue && statusValue !== 'active') params.set('status', statusValue)
     if (pageValue > 1) params.set('page', String(pageValue))
+    if (pageSizeValue !== 10) params.set('pageSize', String(pageSizeValue))
 
     const queryString = params.toString()
     router.push(queryString ? `/products?${queryString}` : '/products')
   }
+
+  useDebouncedSearch(searchInput, initialSearch, (nextSearch) => {
+    navigateWithParams({ search: nextSearch, page: 1 })
+  })
 
   function handleSearchSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -259,7 +270,7 @@ export function ProductsView({
                 <TableHead>Harga Modal</TableHead>
                 <TableHead>Harga Jual</TableHead>
                 <TableHead>Status</TableHead>
-                {canWrite ? <TableHead className="text-right">Aksi</TableHead> : null}
+                <TableHead className="text-right">Aksi</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -316,50 +327,79 @@ export function ProductsView({
                         </Badge>
                       )}
                     </TableCell>
-                    {canWrite ? (
-                      <TableCell className="text-right">
-                        <div className="inline-flex items-center justify-end gap-1">
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => openEditDialog(product)}
-                            aria-label={`Edit produk ${product.name}`}
-                          >
-                            <Pencil className="size-3.5" aria-hidden="true" />
-                            Edit
-                          </Button>
-                          {isArchived ? (
+                    <TableCell className="whitespace-nowrap text-right">
+                      <div className="inline-flex items-center justify-end gap-1.5 whitespace-nowrap">
+                        {!isArchived ? (
+                          <div className="inline-flex items-center gap-1">
+                            <Link
+                              href={`/inventory/stock-in?productId=${product.id}`}
+                              title={`Tambah stok ${product.name}`}
+                              aria-label={`Tambah stok ${product.name}`}
+                              className="inline-flex h-7 shrink-0 items-center gap-1 rounded-md border border-emerald-500/25 bg-emerald-500/10 px-2.5 text-xs font-medium whitespace-nowrap text-emerald-700 transition-colors hover:bg-emerald-500/20 dark:border-emerald-400/25 dark:bg-emerald-400/10 dark:text-emerald-300 dark:hover:bg-emerald-400/20"
+                            >
+                              <PackagePlus className="size-3.5 shrink-0" aria-hidden="true" />
+                              <span>Stok</span>
+                            </Link>
+                            <Link
+                              href={`/inventory/stock-out?productId=${product.id}`}
+                              title={`Keluarkan stok ${product.name}`}
+                              aria-label={`Keluarkan stok ${product.name}`}
+                              className="inline-flex h-7 shrink-0 items-center gap-1 rounded-md border border-amber-500/25 bg-amber-500/10 px-2.5 text-xs font-medium whitespace-nowrap text-amber-700 transition-colors hover:bg-amber-500/20 dark:border-amber-400/25 dark:bg-amber-400/10 dark:text-amber-300 dark:hover:bg-amber-400/20"
+                            >
+                              <PackageMinus className="size-3.5 shrink-0" aria-hidden="true" />
+                              <span>Keluar</span>
+                            </Link>
+                          </div>
+                        ) : null}
+                        {!isArchived && canWrite ? (
+                          <span className="mx-0.5 h-4 w-px bg-border" aria-hidden="true" />
+                        ) : null}
+                        {canWrite ? (
+                          <div className="inline-flex items-center gap-1">
                             <Button
                               type="button"
                               variant="ghost"
                               size="sm"
-                              onClick={() =>
-                                setConfirmTarget({ product, mode: 'restore' })
-                              }
-                              aria-label={`Pulihkan produk ${product.name}`}
+                              className="h-7 shrink-0 px-2 text-xs whitespace-nowrap"
+                              onClick={() => openEditDialog(product)}
+                              aria-label={`Edit produk ${product.name}`}
                             >
-                              <ArchiveRestore className="size-3.5" aria-hidden="true" />
-                              Pulihkan
+                              <Pencil className="size-3.5 shrink-0" aria-hidden="true" />
+                              Edit
                             </Button>
-                          ) : (
-                            <Button
-                              type="button"
-                              variant="ghost"
-                              size="sm"
-                              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-                              onClick={() =>
-                                setConfirmTarget({ product, mode: 'archive' })
-                              }
-                              aria-label={`Arsipkan produk ${product.name}`}
-                            >
-                              <Archive className="size-3.5" aria-hidden="true" />
-                              Arsipkan
-                            </Button>
-                          )}
-                        </div>
-                      </TableCell>
-                    ) : null}
+                            {isArchived ? (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 shrink-0 px-2 text-xs whitespace-nowrap"
+                                onClick={() =>
+                                  setConfirmTarget({ product, mode: 'restore' })
+                                }
+                                aria-label={`Pulihkan produk ${product.name}`}
+                              >
+                                <ArchiveRestore className="size-3.5 shrink-0" aria-hidden="true" />
+                                Pulihkan
+                              </Button>
+                            ) : (
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                className="h-7 shrink-0 px-2 text-xs whitespace-nowrap text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                onClick={() =>
+                                  setConfirmTarget({ product, mode: 'archive' })
+                                }
+                                aria-label={`Arsipkan produk ${product.name}`}
+                              >
+                                <Archive className="size-3.5 shrink-0" aria-hidden="true" />
+                                Arsipkan
+                              </Button>
+                            )}
+                          </div>
+                        ) : null}
+                      </div>
+                    </TableCell>
                   </TableRow>
                 )
               })}
@@ -372,6 +412,9 @@ export function ProductsView({
             total={total}
             pageSize={pageSize}
             onPageChange={(nextPage) => navigateWithParams({ page: nextPage })}
+            onPageSizeChange={(nextPageSize) =>
+              navigateWithParams({ pageSize: nextPageSize, page: 1 })
+            }
           />
         </Card>
       )}
