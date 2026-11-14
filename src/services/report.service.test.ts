@@ -16,15 +16,19 @@ const WAREHOUSE_ID = '22222222-2222-4222-8222-222222222222'
 
 function createChainResult<T>(rows: T) {
   const result = Promise.resolve(rows) as Promise<T> & {
+    innerJoin: ReturnType<typeof vi.fn>
     leftJoin: ReturnType<typeof vi.fn>
     where: ReturnType<typeof vi.fn>
+    groupBy: ReturnType<typeof vi.fn>
     orderBy: ReturnType<typeof vi.fn>
     limit: ReturnType<typeof vi.fn>
     offset: ReturnType<typeof vi.fn>
   }
 
+  result.innerJoin = vi.fn(() => result)
   result.leftJoin = vi.fn(() => result)
   result.where = vi.fn(() => result)
+  result.groupBy = vi.fn(() => result)
   result.orderBy = vi.fn(() => result)
   result.limit = vi.fn(() => result)
   result.offset = vi.fn(() => result)
@@ -156,6 +160,50 @@ describe('ReportService', () => {
     expect(exported.filename).toBe('stockly-laporan-stok-saat-ini.csv')
     expect(exported.csv).toContain('"Teh, Hijau"')
     expect(exported.csv).toContain('Menipis')
+  })
+
+  it('returns monthly sales breakdown, available years, and peak month', async () => {
+    const monthlyRows = [
+      {
+        month: 3,
+        revenue: '15000000.00',
+        profit: '5000000.00',
+        units: 120,
+        transactionCount: 15,
+      },
+      {
+        month: 11,
+        revenue: '25000000.00',
+        profit: '8000000.00',
+        units: 180,
+        transactionCount: 22,
+      },
+    ]
+    const yearRows = [{ year: 2026 }, { year: 2025 }]
+
+    const responses = [monthlyRows, yearRows]
+    let idx = 0
+    const select = vi.fn(() => ({
+      from: vi.fn(() => createChainResult(responses[idx++] ?? [])),
+    }))
+    const fakeDb = { select } as unknown as AppDatabase
+
+    const sales = await ReportService.getMonthlySales(
+      OWNER_CTX,
+      { year: 2026, reason: 'SALE' },
+      fakeDb,
+    )
+
+    expect(sales.year).toBe(2026)
+    expect(sales.monthlyData).toHaveLength(12)
+    expect(sales.monthlyData[2].revenue).toBe(15000000)
+    expect(sales.monthlyData[10].revenue).toBe(25000000)
+    expect(sales.annualSummary.totalRevenue).toBe(40000000)
+    expect(sales.annualSummary.totalUnits).toBe(300)
+    expect(sales.annualSummary.totalTransactions).toBe(37)
+    expect(sales.annualSummary.peakMonth?.monthLabel).toBe('Nov')
+    expect(sales.availableYears).toContain(2026)
+    expect(sales.availableYears).toContain(2025)
   })
 })
 

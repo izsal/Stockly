@@ -28,7 +28,8 @@ import { Card, CardContent, CardHeader } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { formatRupiah } from '@/src/lib/format'
 import type { MovementType } from '@/src/lib/validation/inventory'
-import { getDefaultDateRange } from '@/src/lib/validation/reports'
+import { getDefaultDateRange, type MonthlySalesSummary } from '@/src/lib/validation/reports'
+import { MonthlySalesChart } from './monthly-sales-chart'
 
 type DashboardSummaryData = {
   defaultWarehouse: { id: string; name: string } | null
@@ -93,11 +94,15 @@ export function DashboardView({
   workspaceName,
   roleLabel,
   summary,
+  monthlySales,
+  categories,
 }: {
   userName: string
   workspaceName: string
   roleLabel: string
   summary: DashboardSummaryData
+  monthlySales: MonthlySalesSummary
+  categories: Array<{ id: string; name: string }>
 }) {
   const router = useRouter()
   const [dateFrom, setDateFrom] = useState(summary.dateRange.dateFrom)
@@ -107,10 +112,11 @@ export function DashboardView({
   function applyRange(nextFrom: string, nextTo: string) {
     setDateFrom(nextFrom)
     setDateTo(nextTo)
-    const params = new URLSearchParams()
-    if (nextFrom) params.set('dateFrom', nextFrom)
-    if (nextTo) params.set('dateTo', nextTo)
-    const qs = params.toString()
+    const currentParams =
+      typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams()
+    if (nextFrom) currentParams.set('dateFrom', nextFrom)
+    if (nextTo) currentParams.set('dateTo', nextTo)
+    const qs = currentParams.toString()
     router.push(qs ? `/dashboard?${qs}` : '/dashboard')
   }
 
@@ -133,13 +139,13 @@ export function DashboardView({
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div className="space-y-1.5">
-          <p className="text-sm font-medium text-primary">Ringkasan operasional</p>
+          <p className="text-sm font-medium text-primary">Dashboard operasional</p>
           <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
             Selamat datang, {userName}
           </h1>
           <p className="max-w-2xl text-sm text-muted-foreground">
             Pantau kondisi stok ruang kerja <span className="font-medium text-foreground">{workspaceName}</span>{' '}
-            ({roleLabel}) dan ringkasan pergerakan barang.
+            ({roleLabel}) dan dashboard pergerakan barang.
           </p>
         </div>
 
@@ -351,6 +357,9 @@ export function DashboardView({
           </CardContent>
         </Card>
       </div>
+
+      {/* Grafik Penjualan Bulanan dengan Filter */}
+      <MonthlySalesChart salesSummary={monthlySales} categories={categories} />
 
       <Card>
         <CardHeader className="flex flex-col gap-4 px-5 pt-5 lg:flex-row lg:items-center lg:justify-between">

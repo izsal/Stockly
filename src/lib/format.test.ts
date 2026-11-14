@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import {
+  formatCompactRupiah,
   formatDecimalInputValue,
   formatDecimalToRupiahInput,
+  formatNumberId,
   formatRupiah,
   formatRupiahTyping,
   parseRupiahInputToDecimal,
@@ -52,6 +54,15 @@ describe('Rupiah input conversion helpers', () => {
     expect(parseRupiahInputToDecimal('Rp 1.250.000')).toBe('1250000')
     expect(parseRupiahInputToDecimal('18.500,50')).toBe('18500.50')
     expect(parseRupiahInputToDecimal('18.500,')).toBe('18500')
+  })
+
+  it('formats compact rupiah and indonesian numbers properly', () => {
+    expect(formatCompactRupiah(0)).toBe('Rp 0')
+    expect(formatCompactRupiah(500)).toBe('Rp 500')
+    expect(formatCompactRupiah(50000)).toBe('Rp 50 rb')
+    expect(formatCompactRupiah(2500000)).toBe('Rp 2,5 jt')
+    expect(formatCompactRupiah(1000000000)).toBe('Rp 1 M')
+    expect(formatNumberId(12500)).toBe('12.500')
   })
 })
 

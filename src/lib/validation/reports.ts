@@ -137,9 +137,78 @@ export const reportExportQuerySchema = z.object({
   dateTo: optionalDateOnlySchema.optional(),
 })
 
+export const monthlySalesQuerySchema = z.object({
+  year: z.coerce.number().int().min(2000).max(2100).optional(),
+  categoryId: optionalUuidSchema.optional(),
+  reason: z.enum(['SALE', 'ALL_OUT']).optional().default('SALE'),
+})
+
 export type DashboardSummaryQuery = z.input<typeof dashboardSummaryQuerySchema>
 export type CurrentStockReportQuery = z.input<typeof currentStockReportQuerySchema>
 export type LowStockReportQuery = z.input<typeof lowStockReportQuerySchema>
 export type MovementReportQuery = z.input<typeof movementReportQuerySchema>
 export type ReportExportQuery = z.input<typeof reportExportQuerySchema>
+export type MonthlySalesQuery = z.input<typeof monthlySalesQuerySchema>
+
+export const MONTH_SHORT_LABELS = [
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'Mei',
+  'Jun',
+  'Jul',
+  'Agu',
+  'Sep',
+  'Okt',
+  'Nov',
+  'Des',
+] as const
+
+export const MONTH_FULL_LABELS = [
+  'Januari',
+  'Februari',
+  'Maret',
+  'April',
+  'Mei',
+  'Juni',
+  'Juli',
+  'Agustus',
+  'September',
+  'Oktober',
+  'November',
+  'Desember',
+] as const
+
+export type MonthlySalesPoint = {
+  month: number
+  monthLabel: string
+  fullMonthLabel: string
+  revenue: number
+  units: number
+  profit: number
+  transactionCount: number
+}
+
+export type MonthlySalesSummary = {
+  year: number
+  availableYears: number[]
+  categoryId: string | null
+  reason: 'SALE' | 'ALL_OUT'
+  monthlyData: MonthlySalesPoint[]
+  annualSummary: {
+    totalRevenue: number
+    totalUnits: number
+    totalProfit: number
+    totalTransactions: number
+    averageMonthlyRevenue: number
+    peakMonth: {
+      month: number
+      monthLabel: string
+      fullMonthLabel: string
+      revenue: number
+      units: number
+    } | null
+  }
+}
 

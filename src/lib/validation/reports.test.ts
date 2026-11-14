@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 import {
   currentStockReportQuerySchema,
   getDefaultDateRange,
+  monthlySalesQuerySchema,
   reportExportQuerySchema,
   resolveJakartaDateBounds,
 } from './reports'
@@ -39,6 +40,19 @@ describe('reports validation and date helpers', () => {
     })
 
     expect(reportExportQuerySchema.safeParse({ report: 'unknown' }).success).toBe(false)
+  })
+
+  it('validates monthly sales query parameters', () => {
+    const parsed = monthlySalesQuerySchema.parse({
+      year: '2026',
+      categoryId: '11111111-1111-4111-8111-111111111111',
+      reason: 'SALE',
+    })
+    expect(parsed).toEqual({
+      year: 2026,
+      categoryId: '11111111-1111-4111-8111-111111111111',
+      reason: 'SALE',
+    })
   })
 })
 

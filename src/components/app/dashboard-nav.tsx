@@ -17,11 +17,11 @@ import { cn } from '@/lib/utils'
 
 const NAV_GROUPS = [
   {
-    label: 'RINGKASAN',
+    label: 'DASHBOARD',
     items: [
       {
         href: '/dashboard',
-        label: 'Ringkasan',
+        label: 'Dashboard',
         icon: LayoutDashboard,
       },
     ],

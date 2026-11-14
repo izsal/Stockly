@@ -176,7 +176,7 @@ function BetaFeedbackDialog({
             </Field>
 
             <Field data-invalid={Boolean(fieldErrors.summary)}>
-              <FieldLabel htmlFor="feedback-summary">Ringkasan</FieldLabel>
+              <FieldLabel htmlFor="feedback-summary">Dashboard</FieldLabel>
               <Input
                 id="feedback-summary"
                 value={summary}

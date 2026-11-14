@@ -76,3 +76,25 @@ export function parseRupiahInputToDecimal(formatted: string): string {
   return fraction ? `${whole}.${fraction}` : whole
 }
 
+export function formatNumberId(value: number): string {
+  return new Intl.NumberFormat('id-ID').format(value)
+}
+
+export function formatCompactRupiah(value: number): string {
+  if (value === 0) return 'Rp 0'
+  const abs = Math.abs(value)
+  if (abs >= 1_000_000_000) {
+    const num = (value / 1_000_000_000).toFixed(1).replace(/\.0$/, '').replace('.', ',')
+    return `Rp ${num} M`
+  }
+  if (abs >= 1_000_000) {
+    const num = (value / 1_000_000).toFixed(1).replace(/\.0$/, '').replace('.', ',')
+    return `Rp ${num} jt`
+  }
+  if (abs >= 1_000) {
+    const num = (value / 1_000).toFixed(0)
+    return `Rp ${num} rb`
+  }
+  return `Rp ${value}`
+}
+

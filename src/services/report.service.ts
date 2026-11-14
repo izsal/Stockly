@@ -31,12 +31,18 @@ import {
   dashboardSummaryQuerySchema,
   getDefaultDateRange,
   lowStockReportQuerySchema,
+  MONTH_FULL_LABELS,
+  MONTH_SHORT_LABELS,
+  monthlySalesQuerySchema,
   movementReportQuerySchema,
   reportExportQuerySchema,
   resolveJakartaDateBounds,
   type CurrentStockReportQuery,
   type DashboardSummaryQuery,
   type LowStockReportQuery,
+  type MonthlySalesPoint,
+  type MonthlySalesQuery,
+  type MonthlySalesSummary,
   type MovementReportQuery,
   type ReportExportQuery,
 } from '@/src/lib/validation/reports'
@@ -230,6 +236,163 @@ export async function getDashboardSummary(
       currentStock: Number(item.currentStock ?? 0),
       status: deriveStockStatus(Number(item.currentStock ?? 0), item.minimumStock),
     })),
+  }
+}
+
+export async function getMonthlySales(
+  ctx: WorkspaceContext,
+  query: MonthlySalesQuery = {},
+  database: AppDatabase = db,
+): Promise<MonthlySalesSummary> {
+  assertWorkspacePermission(ctx, 'reports:read')
+  const parsed = parseInput(monthlySalesQuerySchema, query)
+
+  const currentYear = new Date().getFullYear()
+  const selectedYear = parsed.year ?? currentYear
+  const selectedReason = parsed.reason ?? 'SALE'
+  const selectedCategoryId = parsed.categoryId ?? null
+
+  const startOfYear = new Date(`${selectedYear}-01-01T00:00:00+07:00`)
+  const endOfYear = new Date(`${selectedYear}-12-31T23:59:59.999+07:00`)
+
+  const movementFilters = [
+    eq(inventoryMovements.workspaceId, ctx.workspaceId),
+    eq(inventoryMovements.type, 'OUT'),
+    gte(inventoryMovements.createdAt, startOfYear),
+    lte(inventoryMovements.createdAt, endOfYear),
+  ]
+
+  if (selectedReason === 'SALE') {
+    movementFilters.push(eq(inventoryMovements.reason, 'SALE'))
+  }
+
+  if (selectedCategoryId) {
+    movementFilters.push(eq(products.categoryId, selectedCategoryId))
+  }
+
+  const monthExpr = sql<number>`EXTRACT(MONTH FROM (${inventoryMovements.createdAt} AT TIME ZONE 'Asia/Jakarta'))::int`
+  const qtyExpr = sql<number>`abs(${inventoryMovements.quantityDelta})`
+  const revenueExpr = sql<string>`coalesce(sum(${qtyExpr} * coalesce(${products.sellingPrice}, 0)), 0)::numeric(14,2)::text`
+  const profitExpr = sql<string>`coalesce(sum(${qtyExpr} * (coalesce(${products.sellingPrice}, 0) - coalesce(${products.costPrice}, 0))), 0)::numeric(14,2)::text`
+  const unitsExpr = sql<number>`coalesce(sum(${qtyExpr}), 0)::int`
+  const txCountExpr = sql<number>`count(${inventoryMovements.id})::int`
+
+  const yearExpr = sql<number>`EXTRACT(YEAR FROM (${inventoryMovements.createdAt} AT TIME ZONE 'Asia/Jakarta'))::int`
+
+  const [monthlyRows, yearRows] = await Promise.all([
+    database
+      .select({
+        month: monthExpr,
+        revenue: revenueExpr,
+        profit: profitExpr,
+        units: unitsExpr,
+        transactionCount: txCountExpr,
+      })
+      .from(inventoryMovements)
+      .innerJoin(
+        products,
+        and(
+          eq(inventoryMovements.productId, products.id),
+          eq(products.workspaceId, ctx.workspaceId),
+        ),
+      )
+      .where(and(...movementFilters))
+      .groupBy(monthExpr)
+      .orderBy(monthExpr),
+
+    database
+      .select({
+        year: yearExpr,
+      })
+      .from(inventoryMovements)
+      .where(
+        and(
+          eq(inventoryMovements.workspaceId, ctx.workspaceId),
+          eq(inventoryMovements.type, 'OUT'),
+        ),
+      )
+      .groupBy(yearExpr)
+      .orderBy(desc(yearExpr)),
+  ])
+
+  const yearsSet = new Set<number>([currentYear, selectedYear])
+  for (const row of yearRows) {
+    if (typeof row.year === 'number' && !Number.isNaN(row.year)) {
+      yearsSet.add(row.year)
+    }
+  }
+  const availableYears = Array.from(yearsSet).sort((a, b) => b - a)
+
+  const monthlyMap = new Map<
+    number,
+    {
+      revenue: string
+      profit: string
+      units: number
+      transactionCount: number
+    }
+  >()
+
+  for (const row of monthlyRows) {
+    monthlyMap.set(row.month, row)
+  }
+
+  let totalRevenue = 0
+  let totalUnits = 0
+  let totalProfit = 0
+  let totalTransactions = 0
+  let peakMonth: MonthlySalesSummary['annualSummary']['peakMonth'] = null
+  let maxRevenue = -1
+
+  const monthlyData: MonthlySalesPoint[] = Array.from({ length: 12 }, (_, i) => {
+    const monthNum = i + 1
+    const found = monthlyMap.get(monthNum)
+    const rev = Number(found?.revenue ?? 0)
+    const unt = Number(found?.units ?? 0)
+    const prf = Number(found?.profit ?? 0)
+    const txCount = Number(found?.transactionCount ?? 0)
+
+    totalRevenue += rev
+    totalUnits += unt
+    totalProfit += prf
+    totalTransactions += txCount
+
+    if (rev > maxRevenue && rev > 0) {
+      maxRevenue = rev
+      peakMonth = {
+        month: monthNum,
+        monthLabel: MONTH_SHORT_LABELS[i],
+        fullMonthLabel: MONTH_FULL_LABELS[i],
+        revenue: rev,
+        units: unt,
+      }
+    }
+
+    return {
+      month: monthNum,
+      monthLabel: MONTH_SHORT_LABELS[i],
+      fullMonthLabel: MONTH_FULL_LABELS[i],
+      revenue: rev,
+      units: unt,
+      profit: prf,
+      transactionCount: txCount,
+    }
+  })
+
+  return {
+    year: selectedYear,
+    availableYears,
+    categoryId: selectedCategoryId,
+    reason: selectedReason,
+    monthlyData,
+    annualSummary: {
+      totalRevenue,
+      totalUnits,
+      totalProfit,
+      totalTransactions,
+      averageMonthlyRevenue: Math.round(totalRevenue / 12),
+      peakMonth,
+    },
   }
 }
 
@@ -726,6 +889,7 @@ export async function exportReportCsv(
 
 export const ReportService = {
   getDashboardSummary,
+  getMonthlySales,
   getCurrentStockReport,
   getLowStockReport,
   getMovementReport,

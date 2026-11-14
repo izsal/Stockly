@@ -56,7 +56,7 @@ Use semantic CSS variables compatible with shadcn/ui rather than hardcoding colo
 - Header: workspace name/switcher, help placeholder, user menu.
 - Main content: page title, description, primary action, content.
 - Sidebar groups:
-  - Ringkasan: Dashboard
+  - Dashboard: Dashboard
   - Inventaris: Produk, Kategori, Stok Masuk, Stok Keluar, Riwayat Stok
   - Relasi: Supplier
   - Laporan: Laporan Stok
